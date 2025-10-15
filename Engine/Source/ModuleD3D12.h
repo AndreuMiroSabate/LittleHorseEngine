@@ -12,7 +12,8 @@ public:
 
 	bool init() override;
 
-	bool crateDevice();
+	bool createDevice();
+	bool enbleDebugLayer();
 
 private:
 	HWND hWnd = NULL;

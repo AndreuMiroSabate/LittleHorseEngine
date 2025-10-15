@@ -11,6 +11,14 @@ ModuleD3D12::~ModuleD3D12()
 
 bool ModuleD3D12::init()
 {
+	enbleDebugLayer();
+	createDevice();
+
+	return true;
+}
+
+bool ModuleD3D12::enbleDebugLayer()
+{
 #if defined(_DEBUG)
 	{
 		ComPtr<ID3D12Debug> debugController;
@@ -19,11 +27,11 @@ bool ModuleD3D12::init()
 			debugController->EnableDebugLayer();
 		}
 	}
+	return true;
 #endif
-return true;
 }
 
-bool ModuleD3D12::crateDevice()
+bool ModuleD3D12::createDevice()
 {
 #if defined(_DEBUG)
 	CreateDXGIFactory2(DXGI_CREATE_FACTORY_DEBUG, IID_PPV_ARGS(&factory));
