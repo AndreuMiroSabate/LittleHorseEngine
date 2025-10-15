@@ -11,6 +11,7 @@
 #include <shellapi.h>
 
 #include "dxgidebug.h"
+#include "dxgi1_3.h"
 
 #include "Keyboard.h"
 #include "Mouse.h"
@@ -72,9 +73,16 @@ int APIENTRY wWinMain(_In_ HINSTANCE hInstance,
             TranslateMessage(&msg);
             DispatchMessage(&msg);
         }
+		app->update();
     }
 
     delete app;
+
+	ComPtr<IDXGIDebug> dxgiController;
+    if(SUCCEEDED(DXGIGetDebugInterface1(0, IID_PPV_ARGS(&dxgiController))))
+    {
+        dxgiController->ReportLiveObjects(DXGI_DEBUG_ALL, DXGI_DEBUG_RLO_ALL);
+	}
 
 
     return (int) msg.wParam;
