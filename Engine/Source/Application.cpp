@@ -3,8 +3,6 @@
 #include "ModuleInput.h"
 #include "ModuleD3D12.h"
 
-//class ModuleD3D12;
-
 
 Application::Application(int argc, wchar_t** argv, void* hWnd)
 {
