@@ -19,9 +19,9 @@ public:
 
 	bool createDevice();
 	bool enbleDebugLayer();
-	bool createCommandQueue();
-	bool createCommandList();
-	bool createSwapChain();
+	void createCommandQueue();
+	void createCommandList();
+	void createSwapChain();
 
 private:
 

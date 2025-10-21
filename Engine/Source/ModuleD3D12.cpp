@@ -64,7 +64,7 @@ bool ModuleD3D12::createDevice()
 	return true;
 }
 
-bool ModuleD3D12::createCommandQueue()
+void ModuleD3D12::createCommandQueue()
 {
 	D3D12_COMMAND_QUEUE_DESC desc = {};
 	desc.Type = D3D12_COMMAND_LIST_TYPE_DIRECT;
@@ -75,12 +75,13 @@ bool ModuleD3D12::createCommandQueue()
 	device->CreateCommandQueue(&desc, IID_PPV_ARGS(&comandQueue));
 }
 
-bool ModuleD3D12::createCommandList()
+void ModuleD3D12::createCommandList()
 {
 	device->CreateCommandAllocator(D3D12_COMMAND_LIST_TYPE_DIRECT, IID_PPV_ARGS(&commandAllocator));
 	device->CreateCommandList(0, D3D12_COMMAND_LIST_TYPE_DIRECT, commandAllocator.Get(), nullptr, IID_PPV_ARGS(&comandList));
+	
 }
-bool ModuleD3D12::createSwapChain()
+void ModuleD3D12::createSwapChain()
 {
 	DXGI_SWAP_CHAIN_DESC1 swapChainDesc = {};
 
@@ -100,5 +101,4 @@ bool ModuleD3D12::createSwapChain()
 	swapChainDesc.AlphaMode = DXGI_ALPHA_MODE_UNSPECIFIED;
 	swapChainDesc.Flags = 0;
 
-	
 }
