@@ -2,7 +2,7 @@
 #include "ModuleD3D12.h"
 
 
-ModuleD3D12::ModuleD3D12(HWND hWnd) : hWnd(hWnd)
+ModuleD3D12::ModuleD3D12(HWND hWnd)
 {
 }
 ModuleD3D12::~ModuleD3D12()

@@ -16,7 +16,7 @@ public:
 	bool enbleDebugLayer();
 
 private:
-	HWND hWnd = NULL;
+
 	ComPtr<IDXGIFactory6> factory;
 };
 
