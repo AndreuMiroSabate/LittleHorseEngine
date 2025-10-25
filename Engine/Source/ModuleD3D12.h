@@ -18,20 +18,23 @@ public:
 	void render() override;
 
 	bool createDevice();
-	bool enbleDebugLayer();
+	void enbleDebugLayer();
 	void createCommandQueue();
 	void createCommandList();
 	void createSwapChain();
+	void resourceBarrier();
 
 private:
+	HWND hWnd;
 
 	ComPtr<IDXGIFactory6> factory;
 	ComPtr<IDXGIAdapter4> adpater;
 	ComPtr<ID3D12Device> device;
 	ComPtr<ID3D12InfoQueue> infoQueue;
 	ComPtr<ID3D12CommandQueue> comandQueue;
-	ComPtr<ID3D12CommandList> comandList;
+	ComPtr<ID3D12GraphicsCommandList> comandList;
 	ComPtr<ID3D12CommandAllocator> commandAllocator;
+	ComPtr<IDXGISwapChain1> swapChain;
 	
 };
 

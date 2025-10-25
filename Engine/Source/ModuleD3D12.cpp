@@ -29,7 +29,7 @@ void ModuleD3D12::render()
 	
 }
 
-bool ModuleD3D12::enbleDebugLayer()
+void ModuleD3D12::enbleDebugLayer()
 {
 #if defined(_DEBUG)
 	{
@@ -39,7 +39,6 @@ bool ModuleD3D12::enbleDebugLayer()
 			debugController->EnableDebugLayer();
 		}
 	}
-	return true;
 #endif
 }
 
@@ -101,4 +100,23 @@ void ModuleD3D12::createSwapChain()
 	swapChainDesc.AlphaMode = DXGI_ALPHA_MODE_UNSPECIFIED;
 	swapChainDesc.Flags = 0;
 
+	factory->CreateSwapChainForHwnd(comandQueue.Get(), hWnd, &swapChainDesc, nullptr, nullptr, &swapChain);
+
+}
+void ModuleD3D12::resourceBarrier()
+{
+	CD3DX12_RESOURCE_BARRIER transitionBarrier;
+	transitionBarrier = CD3DX12_RESOURCE_BARRIER::Transition(
+		nullptr,
+		D3D12_RESOURCE_STATE_PRESENT,
+		D3D12_RESOURCE_STATE_RENDER_TARGET
+	);
+
+	//D3D12_RESOURCE_BARRIER barrier = {};
+
+	//barrier.Type = D3D12_RESOURCE_BARRIER_TYPE_TRANSITION;	
+	//barrier.Flags = D3D12_RESOURCE_BARRIER_FLAG_NONE;
+	//barrier.Transition.pResource = nullptr; //Need to be changed
+
+	comandList->ResourceBarrier(1, &transitionBarrier);
 }
