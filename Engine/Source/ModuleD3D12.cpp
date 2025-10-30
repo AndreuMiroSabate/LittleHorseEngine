@@ -21,12 +21,11 @@ bool ModuleD3D12::init()
 
 void ModuleD3D12::preRender()
 {
-	
 }
 
 void ModuleD3D12::render()
 {
-	
+	//resourceBarrier();
 }
 
 void ModuleD3D12::enbleDebugLayer()
