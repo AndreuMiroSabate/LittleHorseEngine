@@ -16,6 +16,7 @@ public:
 
 	bool init() override;
 	void preRender() override;
+	void postRender() override;
 	void render() override;
 
 	bool createDevice();
@@ -23,10 +24,16 @@ public:
 	void createCommandQueue();
 	void createCommandList();
 	void createSwapChain();
-	void resourceBarrier();
+	void createRenderTargets();
+	void createdrawFence();
+
+	D3D12_CPU_DESCRIPTOR_HANDLE getRenderTargetDescriptor();
+
+	void getWindowSize(unsigned& width, unsigned& height);
+
 
 private:
-	HWND hWnd;
+	HWND hWnd = NULL;
 
 	ComPtr<IDXGIFactory6> factory;
 	ComPtr<IDXGIAdapter4> adpater;
@@ -34,8 +41,25 @@ private:
 	ComPtr<ID3D12InfoQueue> infoQueue;
 	ComPtr<ID3D12CommandQueue> comandQueue;
 	ComPtr<ID3D12GraphicsCommandList> comandList;
-	ComPtr<ID3D12CommandAllocator> commandAllocator;
-	ComPtr<IDXGISwapChain1> swapChain;
+	ComPtr<ID3D12CommandAllocator> commandAllocator[FRAMES_IN_FLIGHT];
+	ComPtr<IDXGISwapChain4> swapChain;
+	ComPtr<ID3D12Resource> backBuffers[FRAMES_IN_FLIGHT];
+	ComPtr<ID3D12DescriptorHeap> rtdescriptorHeap;
+	ComPtr<ID3D12DescriptorHeap> descriptorHeap;
+	ComPtr<ID3D12Fence> drawFence;
+
+	HANDLE drawFenceEvent = NULL;
+
+	unsigned windowWidth = 0;
+	unsigned windowHeight = 0;
+
+	unsigned currentBackBufferIdx = 0;
+	unsigned drawFenceValues[FRAMES_IN_FLIGHT] = { 0, 0, 0 };
+	unsigned drawFenceCounter = 0;
+
+	unsigned frameValues[FRAMES_IN_FLIGHT] = { 0, 0, 0 };
+	unsigned frameIndex = 0;
+	unsigned lastCompletedFrame = 0;
 	
 };
 
