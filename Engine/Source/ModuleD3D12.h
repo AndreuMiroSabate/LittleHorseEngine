@@ -29,6 +29,10 @@ public:
 
 	D3D12_CPU_DESCRIPTOR_HANDLE getRenderTargetDescriptor();
 
+	HWND getHwnd() { return hWnd; }
+	ID3D12Device5* getDevice() { return device.Get(); }
+	ID3D12GraphicsCommandList* getCommandList() { return comandList.Get(); }
+
 	void getWindowSize(unsigned& width, unsigned& height);
 
 
@@ -37,7 +41,7 @@ private:
 
 	ComPtr<IDXGIFactory6> factory;
 	ComPtr<IDXGIAdapter4> adpater;
-	ComPtr<ID3D12Device> device;
+	ComPtr<ID3D12Device5> device;
 	ComPtr<ID3D12InfoQueue> infoQueue;
 	ComPtr<ID3D12CommandQueue> comandQueue;
 	ComPtr<ID3D12GraphicsCommandList> comandList;

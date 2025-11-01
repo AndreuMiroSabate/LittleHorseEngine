@@ -4,6 +4,9 @@
 #include "ModuleD3D12.h"
 #include "ImGuiPass.h"
 
+class ModuleD3D12;
+class ImGuiPass;
+
 class ModuleEditor :
     public Module
 {
@@ -17,5 +20,8 @@ public:
 
 private:
 
+	ImGuiPass* imguiPass = nullptr;
+	ModuleD3D12* d3d12 = nullptr;
+    
 };
 

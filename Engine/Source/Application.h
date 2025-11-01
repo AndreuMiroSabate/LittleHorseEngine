@@ -7,20 +7,23 @@
 #include <chrono>
 
 class Module;
+class ModuleD3D12;
 
 class Application
 {
 public:
 
-	Application(int argc, wchar_t** argv, void* hWnd);
-	~Application();
+    Application(int argc, wchar_t** argv, void* hWnd);
+    ~Application();
 
-	bool         init();
+    bool         init();
     bool         postInit();
-	void         update();
-	bool         cleanUp();
+    void         update();
+    bool         cleanUp();
 
-    
+    ModuleD3D12* getD3D12() { return d3d12; }
+
+
     float                       getFPS() const { return 1000.0f * float(MAX_FPS_TICKS) / tickSum; }
     float                       getAvgElapsedMs() const { return tickSum / float(MAX_FPS_TICKS); }
     uint64_t                    getElapsedMilis() const { return elapsedMilis; }
@@ -33,6 +36,8 @@ private:
     typedef std::array<uint64_t, MAX_FPS_TICKS> TickList;
 
     std::vector<Module*> modules;
+
+	ModuleD3D12* d3d12 = nullptr;
 
     uint64_t  lastMilis = 0;
     TickList  tickList;
