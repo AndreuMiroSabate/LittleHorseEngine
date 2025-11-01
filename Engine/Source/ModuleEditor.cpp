@@ -15,18 +15,18 @@ ModuleEditor::~ModuleEditor()
 
 bool ModuleEditor::postInit()
 {
-	d3d12 = app->getD3D12();
-	imguiPass = new ImGuiPass(d3d12->getDevice(), d3d12->getHwnd(), d3d12->getRenderTargetDescriptor(), D3D12_GPU_DESCRIPTOR_HANDLE{});
+	/*d3d12 = app->getD3D12();
+	imguiPass = new ImGuiPass(d3d12->getDevice(), d3d12->getHwnd(), d3d12->getRenderTargetDescriptor(), D3D12_GPU_DESCRIPTOR_HANDLE{});*/
 	return true;
 }
 
 void ModuleEditor::preRender()
 {
-	imguiPass->startFrame();
-	ImGui::Text("Hello, Editor!");
+	/*imguiPass->startFrame();
+	ImGui::Text("Hello, Editor!");*/
 }
 
 void ModuleEditor::render()
 {
-	imguiPass->record(d3d12->getCommandList(), d3d12->getRenderTargetDescriptor());
+	//imguiPass->record(d3d12->getCommandList(), d3d12->getRenderTargetDescriptor());
 }
