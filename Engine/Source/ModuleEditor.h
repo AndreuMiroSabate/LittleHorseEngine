@@ -20,8 +20,8 @@ public:
 
 private:
 
-	/*ImGuiPass* imguiPass = nullptr;
-	ModuleD3D12* d3d12 = nullptr;*/
+	ImGuiPass* imguiPass = nullptr;
+	ModuleD3D12* d3d12 = nullptr;
     
 };
 

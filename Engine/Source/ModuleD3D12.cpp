@@ -46,16 +46,6 @@ void ModuleD3D12::preRender()
 	frameValues[currentBackBufferIdx] = frameIndex;
 
 	commandAllocator[currentBackBufferIdx]->Reset();
-}
-void ModuleD3D12::postRender()
-{
-	swapChain->Present(1, 0);
-	drawFenceValues[currentBackBufferIdx] = ++drawFenceCounter;
-	comandQueue->Signal(drawFence.Get(), drawFenceValues[currentBackBufferIdx]);
-}
-
-void ModuleD3D12::render()
-{
 	comandList->Reset(commandAllocator[currentBackBufferIdx].Get(), nullptr);
 	CD3DX12_RESOURCE_BARRIER transitionBarrier;
 	transitionBarrier = CD3DX12_RESOURCE_BARRIER::Transition(
@@ -67,6 +57,27 @@ void ModuleD3D12::render()
 	comandList->ResourceBarrier(1, &transitionBarrier);
 	float clearColor[] = { 0.0f, 1.0f, 0.7f, 1.0f };
 	comandList->ClearRenderTargetView(getRenderTargetDescriptor(), clearColor, 0, nullptr);
+}
+void ModuleD3D12::postRender()
+{
+	swapChain->Present(1, 0);
+	drawFenceValues[currentBackBufferIdx] = ++drawFenceCounter;
+	comandQueue->Signal(drawFence.Get(), drawFenceValues[currentBackBufferIdx]);
+}
+
+void ModuleD3D12::render()
+{
+	
+	CD3DX12_RESOURCE_BARRIER transitionBarrier;
+	/*transitionBarrier = CD3DX12_RESOURCE_BARRIER::Transition(
+		backBuffers[currentBackBufferIdx].Get(),
+		D3D12_RESOURCE_STATE_PRESENT,
+		D3D12_RESOURCE_STATE_RENDER_TARGET
+	);
+
+	comandList->ResourceBarrier(1, &transitionBarrier);
+	float clearColor[] = { 0.0f, 1.0f, 0.7f, 1.0f };
+	comandList->ClearRenderTargetView(getRenderTargetDescriptor(), clearColor, 0, nullptr);*/
 
 	transitionBarrier = CD3DX12_RESOURCE_BARRIER::Transition(
 		backBuffers[currentBackBufferIdx].Get(),
