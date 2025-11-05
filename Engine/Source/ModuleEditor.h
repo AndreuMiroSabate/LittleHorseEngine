@@ -17,6 +17,7 @@ public:
     bool postInit() override;
     void preRender() override;
     void render() override;
+    void consoleLog(const char* msg);
 
 private:
 

@@ -26,6 +26,7 @@ public:
 	void createSwapChain();
 	void createRenderTargets();
 	void createdrawFence();
+	void resize();
 
 	D3D12_CPU_DESCRIPTOR_HANDLE getRenderTargetDescriptor();
 

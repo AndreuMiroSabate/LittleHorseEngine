@@ -30,3 +30,8 @@ void ModuleEditor::render()
 {
 	imguiPass->record(d3d12->getCommandList(), d3d12->getRenderTargetDescriptor());
 }
+
+void ModuleEditor::consoleLog(const char* msg)
+{
+	ImGui::TextUnformatted(msg);
+}

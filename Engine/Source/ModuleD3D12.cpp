@@ -160,7 +160,7 @@ void ModuleD3D12::createSwapChain()
 	swapChainDesc.BufferUsage = DXGI_USAGE_RENDER_TARGET_OUTPUT;
 	swapChainDesc.BufferCount = FRAMES_IN_FLIGHT;
 
-	swapChainDesc.Scaling = DXGI_SCALING_STRETCH;
+	swapChainDesc.Scaling = DXGI_SCALING_NONE;
 	swapChainDesc.SwapEffect = DXGI_SWAP_EFFECT_FLIP_DISCARD;
 
 	swapChainDesc.AlphaMode = DXGI_ALPHA_MODE_UNSPECIFIED;
@@ -212,4 +212,30 @@ void ModuleD3D12::createdrawFence()
 	device->CreateFence(0, D3D12_FENCE_FLAG_NONE, IID_PPV_ARGS(&drawFence));
 
 	drawFenceEvent = CreateEvent(NULL, FALSE, FALSE, NULL);
+}
+
+void ModuleD3D12::resize()
+{
+	unsigned width, height;
+	getWindowSize(width, height);
+
+	if(width != windowWidth || height != windowHeight)
+	{
+		windowWidth = width;
+		windowHeight = height;
+		comandQueue->Signal(drawFence.Get(), ++drawFenceCounter);
+		drawFence->SetEventOnCompletion(drawFenceCounter, drawFenceEvent);
+		WaitForSingleObject(drawFenceEvent, INFINITE);
+		for (unsigned int i = 0; i < FRAMES_IN_FLIGHT; ++i)
+		{
+			backBuffers[i].Reset();
+		}
+
+		DXGI_SWAP_CHAIN_DESC swapChainDesc = {};
+		swapChain->GetDesc(&swapChainDesc);
+		swapChain->ResizeBuffers(FRAMES_IN_FLIGHT, windowWidth, windowHeight, swapChainDesc.BufferDesc.Format, swapChainDesc.Flags);
+		currentBackBufferIdx = swapChain->GetCurrentBackBufferIndex();
+		createRenderTargets();
+	}
+	
 }
