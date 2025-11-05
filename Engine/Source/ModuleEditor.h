@@ -17,12 +17,16 @@ public:
     bool postInit() override;
     void preRender() override;
     void render() override;
+	bool cleanUp() override;    
+    void draw();
     void consoleLog(const char* msg);
 
 private:
 
 	ImGuiPass* imguiPass = nullptr;
 	ModuleD3D12* d3d12 = nullptr;
+
+	bool showDemoWindow = false;    
     
 };
 

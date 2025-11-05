@@ -23,6 +23,8 @@ public:
 
     ModuleD3D12* getD3D12() { return d3d12; }
 
+    void requestBrowser(const char* url);
+
 
     float                       getFPS() const { return 1000.0f * float(MAX_FPS_TICKS) / tickSum; }
     float                       getAvgElapsedMs() const { return tickSum / float(MAX_FPS_TICKS); }

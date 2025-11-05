@@ -23,12 +23,43 @@ bool ModuleEditor::postInit()
 void ModuleEditor::preRender()
 {
 	imguiPass->startFrame();
+	ImGui::ShowDemoWindow(&showDemoWindow);
 	ImGui::Text("Hello, Editor!");
 }
 
 void ModuleEditor::render()
 {
 	imguiPass->record(d3d12->getCommandList(), d3d12->getRenderTargetDescriptor());
+	//draw();
+}
+
+bool ModuleEditor::cleanUp()
+{
+	imguiPass->~ImGuiPass();
+	return true;
+}
+
+void ModuleEditor::draw()
+{
+	if (ImGui::BeginMenu("Help"))
+	{
+		if (ImGui::MenuItem("Gui Demo"))
+		{
+			showDemoWindow = !showDemoWindow;
+		}
+		if(ImGui::MenuItem("Documentation"))
+		{
+			app->requestBrowser("https://github.com/AndreuMiroSabate/DirectX12Engine");
+		}
+		if (ImGui::MenuItem("Download latest"))
+		{
+			app->requestBrowser("https://github.com/AndreuMiroSabate/DirectX12Engine");
+		}
+		if (ImGui::MenuItem("Report a bug"))
+		{
+			app->requestBrowser("https://github.com/AndreuMiroSabate/DirectX12Engine");
+		}
+	}
 }
 
 void ModuleEditor::consoleLog(const char* msg)

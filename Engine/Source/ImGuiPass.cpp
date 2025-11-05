@@ -86,7 +86,7 @@ void ImGuiPass::startFrame()
     ImGui::NewFrame();
 
     // imgui commands
-    ImGui::ShowDemoWindow();
+    
 }
 
 void ImGuiPass::record(ID3D12GraphicsCommandList* commandList, D3D12_CPU_DESCRIPTOR_HANDLE cpuHandle)
