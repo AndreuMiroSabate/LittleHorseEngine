@@ -14,6 +14,7 @@ ModuleResources::~ModuleResources()
 bool ModuleResources::init()
 {
 	d3d12 = app->getD3D12();
+	return true;
 }
 
 void ModuleResources::CreateUploadBuffer()

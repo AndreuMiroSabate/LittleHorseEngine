@@ -16,7 +16,7 @@ ModuleEditor::~ModuleEditor()
 bool ModuleEditor::postInit()
 {
 	d3d12 = app->getD3D12();
-	imguiPass = new ImGuiPass(d3d12->getDevice(), d3d12->getHwnd(), D3D12_CPU_DESCRIPTOR_HANDLE{}, D3D12_GPU_DESCRIPTOR_HANDLE{});
+	imguiPass = new ImGuiPass(d3d12->getDevice(), d3d12->getHwnd(), d3d12->getRenderTargetDescriptor(), D3D12_GPU_DESCRIPTOR_HANDLE{});
 	return true;
 }
 
@@ -24,6 +24,7 @@ void ModuleEditor::preRender()
 {
 	imguiPass->startFrame();
 	ImGui::ShowDemoWindow(&showDemoWindow);
+	draw();
 	//ImGui::Text("Hello, Editor!");
 }
 
@@ -41,7 +42,8 @@ bool ModuleEditor::cleanUp()
 
 void ModuleEditor::draw()
 {
-	if (ImGui::BeginMenu("Help"))
+	//ImGui::Begin("Menu");
+	if (ImGui::BeginMainMenuBar())
 	{
 		if (ImGui::MenuItem("Gui Demo"))
 		{
@@ -49,18 +51,19 @@ void ModuleEditor::draw()
 		}
 		if(ImGui::MenuItem("Documentation"))
 		{
-			app->requestBrowser("https://github.com/AndreuMiroSabate/DirectX12Engine");
+			//app->requestBrowser("https://github.com/AndreuMiroSabate/DirectX12Engine");
 		}
 		if (ImGui::MenuItem("Download latest"))
 		{
-			app->requestBrowser("https://github.com/AndreuMiroSabate/DirectX12Engine");
+			//app->requestBrowser("https://github.com/AndreuMiroSabate/DirectX12Engine");
 		}
 		if (ImGui::MenuItem("Report a bug"))
 		{
-			app->requestBrowser("https://github.com/AndreuMiroSabate/DirectX12Engine");
+			//app->requestBrowser("https://github.com/AndreuMiroSabate/DirectX12Engine");
 		}
+		ImGui::EndMainMenuBar();
 	}
-	ImGui::EndMenu();
+	
 }
 
 void ModuleEditor::consoleLog(const char* msg)
