@@ -24,7 +24,7 @@ void ModuleEditor::preRender()
 {
 	imguiPass->startFrame();
 	ImGui::ShowDemoWindow(&showDemoWindow);
-	ImGui::Text("Hello, Editor!");
+	//ImGui::Text("Hello, Editor!");
 }
 
 void ModuleEditor::render()
@@ -60,6 +60,7 @@ void ModuleEditor::draw()
 			app->requestBrowser("https://github.com/AndreuMiroSabate/DirectX12Engine");
 		}
 	}
+	ImGui::EndMenu();
 }
 
 void ModuleEditor::consoleLog(const char* msg)

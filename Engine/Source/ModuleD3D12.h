@@ -27,6 +27,7 @@ public:
 	void createRenderTargets();
 	void createdrawFence();
 	void resize();
+	void flush();
 
 	D3D12_CPU_DESCRIPTOR_HANDLE getRenderTargetDescriptor();
 

@@ -8,9 +8,7 @@ ModuleD3D12::ModuleD3D12(HWND hWnd): 	hWnd(hWnd)
 }
 ModuleD3D12::~ModuleD3D12()
 {
-	comandQueue->Signal(drawFence.Get(), ++drawFenceCounter);
-	drawFence->SetEventOnCompletion(drawFenceCounter, drawFenceEvent);
-	WaitForSingleObject(drawFenceEvent, INFINITE);
+	flush();
 }
 
 bool ModuleD3D12::init()
@@ -223,9 +221,7 @@ void ModuleD3D12::resize()
 	{
 		windowWidth = width;
 		windowHeight = height;
-		comandQueue->Signal(drawFence.Get(), ++drawFenceCounter);
-		drawFence->SetEventOnCompletion(drawFenceCounter, drawFenceEvent);
-		WaitForSingleObject(drawFenceEvent, INFINITE);
+		flush();
 		for (unsigned int i = 0; i < FRAMES_IN_FLIGHT; ++i)
 		{
 			backBuffers[i].Reset();
@@ -238,4 +234,11 @@ void ModuleD3D12::resize()
 		createRenderTargets();
 	}
 	
+}
+
+void ModuleD3D12::flush()
+{
+	comandQueue->Signal(drawFence.Get(), ++drawFenceCounter);
+	drawFence->SetEventOnCompletion(drawFenceCounter, drawFenceEvent);
+	WaitForSingleObject(drawFenceEvent, INFINITE);
 }
