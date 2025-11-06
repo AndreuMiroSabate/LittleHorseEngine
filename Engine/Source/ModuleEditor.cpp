@@ -42,27 +42,34 @@ bool ModuleEditor::cleanUp()
 
 void ModuleEditor::draw()
 {
-	//ImGui::Begin("Menu");
-	if (ImGui::BeginMainMenuBar())
+	ImGui::Begin("Menu");
+	if (ImGui::BeginMenuBar())
 	{
-		if (ImGui::MenuItem("Gui Demo"))
+		if (ImGui::BeginMenu("Trial"))
 		{
-			showDemoWindow = !showDemoWindow;
+
+		
+			if (ImGui::MenuItem("Gui Demo"))
+			{
+				showDemoWindow = !showDemoWindow;
+			}
+			if (ImGui::MenuItem("Documentation"))
+			{
+				//app->requestBrowser("https://github.com/AndreuMiroSabate/DirectX12Engine");
+			}
+			if (ImGui::MenuItem("Download latest"))
+			{
+				//app->requestBrowser("https://github.com/AndreuMiroSabate/DirectX12Engine");
+			}
+			if (ImGui::MenuItem("Report a bug"))
+			{
+				//app->requestBrowser("https://github.com/AndreuMiroSabate/DirectX12Engine");
+			}
+			ImGui::EndMenu();
 		}
-		if(ImGui::MenuItem("Documentation"))
-		{
-			//app->requestBrowser("https://github.com/AndreuMiroSabate/DirectX12Engine");
-		}
-		if (ImGui::MenuItem("Download latest"))
-		{
-			//app->requestBrowser("https://github.com/AndreuMiroSabate/DirectX12Engine");
-		}
-		if (ImGui::MenuItem("Report a bug"))
-		{
-			//app->requestBrowser("https://github.com/AndreuMiroSabate/DirectX12Engine");
-		}
-		ImGui::EndMainMenuBar();
+		ImGui::EndMenuBar();
 	}
+	ImGui::End();
 	
 }
 
