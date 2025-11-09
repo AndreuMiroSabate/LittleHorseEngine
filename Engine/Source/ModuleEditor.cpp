@@ -45,10 +45,10 @@ void ModuleEditor::draw()
 	ImGui::Begin("Menu");
 	if (ImGui::BeginMenuBar())
 	{
+
 		if (ImGui::BeginMenu("Trial"))
 		{
-
-		
+			ImGui::MenuItem("(demo menu)", NULL, false, false);
 			if (ImGui::MenuItem("Gui Demo"))
 			{
 				showDemoWindow = !showDemoWindow;

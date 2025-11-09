@@ -34,6 +34,7 @@ public:
 	HWND getHwnd() { return hWnd; }
 	ID3D12Device5* getDevice() { return device.Get(); }
 	ID3D12GraphicsCommandList* getCommandList() { return comandList.Get(); }
+	ID3D12CommandQueue* getCommandQueue() { return comandQueue.Get(); }
 
 	void getWindowSize(unsigned& width, unsigned& height);
 
