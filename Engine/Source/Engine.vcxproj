@@ -181,6 +181,7 @@
     <ClInclude Include="Module.h" />
     <ClInclude Include="ModuleD3D12.h" />
     <ClInclude Include="ModuleEditor.h" />
+    <ClInclude Include="ModuleExercice2.h" />
     <ClInclude Include="ModuleInput.h" />
     <ClInclude Include="ModuleResources.h" />
     <ClInclude Include="Mouse.h" />
@@ -273,6 +274,7 @@
     <ClCompile Include="Keyboard.cpp" />
     <ClCompile Include="ModuleD3D12.cpp" />
     <ClCompile Include="ModuleEditor.cpp" />
+    <ClCompile Include="ModuleExercice2.cpp" />
     <ClCompile Include="ModuleInput.cpp" />
     <ClCompile Include="ModuleResources.cpp" />
     <ClCompile Include="Mouse.cpp" />
