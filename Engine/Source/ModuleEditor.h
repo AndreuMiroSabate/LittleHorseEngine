@@ -20,6 +20,7 @@ public:
 	bool cleanUp() override;    
     void draw();
     void consoleLog(const char* msg);
+	void mainMenuBar();
 
 private:
 
