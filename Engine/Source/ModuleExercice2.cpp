@@ -22,7 +22,7 @@ void ModuleExercice2::render()
 
 	commandList->Reset(d3d12->getCommandAllocator(), pipelineState.Get());
 
-	float clearColor[] = { 1.0f, 0.0f, 0.0f, 1.0f };
+	float clearColor[] = { 0.2f, 0.2f, 0.2f, 1.0f };
 
 	CD3DX12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Transition(
 		d3d12->getBackBuffers(),
@@ -33,7 +33,7 @@ void ModuleExercice2::render()
 
 	d3d12->getWindowSize(width, height);
 
-	D3D12_VIEWPORT viewport{0.0,0.0, float(width), float(height), 0.0, 1.0};
+	D3D12_VIEWPORT viewport{0.0, 0.0, float(width), float(height), 0.0, 1.0};
 	D3D12_RECT scissorRect{ 0, 0, (LONG)width, (LONG)height };
 	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = d3d12->getRenderTargetDescriptor();
 
@@ -42,8 +42,8 @@ void ModuleExercice2::render()
 	commandList->OMSetRenderTargets(1, &rtvHandle, false, nullptr);
 	commandList->ClearRenderTargetView(rtvHandle, clearColor, 0, nullptr);
 	commandList->SetGraphicsRootSignature(rootSignature.Get());
-	commandList->IASetVertexBuffers(0, 1, &vertexBufferView);
 	commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	commandList->IASetVertexBuffers(0, 1, &vertexBufferView);
 	commandList->DrawInstanced(3, 1, 0, 0);
 
 	barrier = CD3DX12_RESOURCE_BARRIER::Transition(
@@ -55,7 +55,7 @@ void ModuleExercice2::render()
 
 	commandList->Close();
 	ID3D12CommandList* commandLists[] = { commandList };
-	d3d12->getCommandQueue()->ExecuteCommandLists(1, reinterpret_cast<ID3D12CommandList* const*>(commandList));
+	d3d12->getCommandQueue()->ExecuteCommandLists(UINT(std::size(commandLists)), commandLists);
 }
 
 void ModuleExercice2::createVertexBuffer()
@@ -75,8 +75,8 @@ void ModuleExercice2::createVertexBuffer()
 	vertexBuffer = app->getResources()->CreateDefaultBuffer(vertices, sizeof(vertices), "Exercice2");
 
 	vertexBufferView.BufferLocation = vertexBuffer->GetGPUVirtualAddress();
-	vertexBufferView.SizeInBytes = sizeof(Vertex);
-	vertexBufferView.StrideInBytes = sizeof(vertices);
+	vertexBufferView.SizeInBytes = sizeof(vertices);
+	vertexBufferView.StrideInBytes = sizeof(Vertex);
 
 }
 
@@ -89,7 +89,6 @@ bool ModuleExercice2::createRootSignature()
 	if (FAILED(D3D12SerializeRootSignature(&rootSignatureDesc, D3D_ROOT_SIGNATURE_VERSION_1, &blob, nullptr)))
 		return false;
 
-	ComPtr<ID3D12RootSignature> rootSignature;
 	if (FAILED(app->getD3D12()->getDevice()->CreateRootSignature(0, blob->GetBufferPointer(), blob->GetBufferSize(), IID_PPV_ARGS(&rootSignature))))
 		return false;
 
