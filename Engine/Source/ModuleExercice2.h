@@ -6,6 +6,7 @@ class ModuleExercice2 :
 {
 public:
     bool init() override;
+    void render() override;
 
     void createVertexBuffer();
     bool createRootSignature();
@@ -16,5 +17,6 @@ private:
     ComPtr<ID3D12Resource> vertexBuffer;
     D3D12_VERTEX_BUFFER_VIEW vertexBufferView;
     ComPtr<ID3D12PipelineState> pipelineState;
+	ComPtr<ID3D12RootSignature> rootSignature;
 };
 

@@ -1,6 +1,7 @@
 #include "Globals.h"
 #include "ModuleExercice2.h"
 #include "Application.h"
+#include "ReadData.h"
 
 
 
@@ -10,6 +11,51 @@ bool ModuleExercice2::init()
 	createRootSignature();
 	createPSO();
 	return true;
+}
+
+void ModuleExercice2::render()
+{
+	ModuleD3D12* d3d12 = app->getD3D12();
+	ID3D12GraphicsCommandList* commandList = d3d12->getCommandList();
+
+	unsigned width, height;
+
+	commandList->Reset(d3d12->getCommandAllocator(), pipelineState.Get());
+
+	float clearColor[] = { 1.0f, 0.0f, 0.0f, 1.0f };
+
+	CD3DX12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Transition(
+		d3d12->getBackBuffers(),
+		D3D12_RESOURCE_STATE_PRESENT,
+		D3D12_RESOURCE_STATE_RENDER_TARGET
+	);
+	commandList->ResourceBarrier(1, &barrier);
+
+	d3d12->getWindowSize(width, height);
+
+	D3D12_VIEWPORT viewport{0.0,0.0, float(width), float(height), 0.0, 1.0};
+	D3D12_RECT scissorRect{ 0, 0, (LONG)width, (LONG)height };
+	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = d3d12->getRenderTargetDescriptor();
+
+	commandList->RSSetViewports(1, &viewport);
+	commandList->RSSetScissorRects(1, &scissorRect);
+	commandList->OMSetRenderTargets(1, &rtvHandle, false, nullptr);
+	commandList->ClearRenderTargetView(rtvHandle, clearColor, 0, nullptr);
+	commandList->SetGraphicsRootSignature(rootSignature.Get());
+	commandList->IASetVertexBuffers(0, 1, &vertexBufferView);
+	commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	commandList->DrawInstanced(3, 1, 0, 0);
+
+	barrier = CD3DX12_RESOURCE_BARRIER::Transition(
+		d3d12->getBackBuffers(),
+		D3D12_RESOURCE_STATE_RENDER_TARGET,
+		D3D12_RESOURCE_STATE_PRESENT
+	);
+	commandList->ResourceBarrier(1, &barrier);
+
+	commandList->Close();
+	ID3D12CommandList* commandLists[] = { commandList };
+	d3d12->getCommandQueue()->ExecuteCommandLists(1, reinterpret_cast<ID3D12CommandList* const*>(commandList));
 }
 
 void ModuleExercice2::createVertexBuffer()
@@ -53,6 +99,21 @@ bool ModuleExercice2::createRootSignature()
 void ModuleExercice2::createPSO()
 {
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc = {};
+	psoDesc.pRootSignature = rootSignature.Get();
+
+	auto dataVS = DX::ReadData(L"Exercice2VS.cso");
+	auto dataPS = DX::ReadData(L"Exercise2PS.cso");
+
+	psoDesc.VS = { dataVS.data(), dataVS.size() };
+	psoDesc.PS = { dataPS.data(), dataPS.size() };
+
+	D3D12_INPUT_ELEMENT_DESC inputLayout[] =
+	{
+		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
+	};
+
+	psoDesc.InputLayout = { inputLayout, sizeof(inputLayout)/ sizeof(D3D12_INPUT_ELEMENT_DESC)};
+
 	psoDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 	psoDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
 	psoDesc.NumRenderTargets = 1;

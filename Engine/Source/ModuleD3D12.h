@@ -35,6 +35,8 @@ public:
 	ID3D12Device5* getDevice() { return device.Get(); }
 	ID3D12GraphicsCommandList* getCommandList() { return comandList.Get(); }
 	ID3D12CommandQueue* getCommandQueue() { return comandQueue.Get(); }
+	ID3D12CommandAllocator* getCommandAllocator() { return commandAllocator[currentBackBufferIdx].Get(); }
+	ID3D12Resource* getBackBuffers() { return backBuffers[currentBackBufferIdx].Get(); }
 
 	void getWindowSize(unsigned& width, unsigned& height);
 

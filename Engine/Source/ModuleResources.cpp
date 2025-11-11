@@ -13,7 +13,6 @@ ModuleResources::~ModuleResources()
 
 bool ModuleResources::init()
 {
-	ComPtr<ID3D12Device5> device;
 
 	d3d12 = app->getD3D12();
 	device = d3d12->getDevice();
@@ -26,11 +25,8 @@ bool ModuleResources::init()
 
 ComPtr<ID3D12Resource> ModuleResources::CreateUploadBuffer(const void* data, size_t size, const char* name)
 {
-	ComPtr<ID3D12Device5> device;
 	ComPtr<ID3D12Resource> buffer;
 	
-
-	device = d3d12->getDevice();
 	
 
 	D3D12_RESOURCE_DESC desc = CD3DX12_RESOURCE_DESC::Buffer(size);
@@ -48,19 +44,17 @@ ComPtr<ID3D12Resource> ModuleResources::CreateUploadBuffer(const void* data, siz
 
 ComPtr<ID3D12Resource>  ModuleResources::CreateDefaultBuffer(const void* data, size_t size, const char* name)
 {
-	ComPtr<ID3D12Device5> device;
 	ComPtr<ID3D12Resource> buffer;
 	ComPtr<ID3D12CommandQueue> commandQueue;
 
-	device = d3d12->getDevice();
 	commandQueue = d3d12->getCommandQueue();
 
 	D3D12_RESOURCE_DESC desc = CD3DX12_RESOURCE_DESC::Buffer(size);
 	CD3DX12_HEAP_PROPERTIES heapProps = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
-	device->CreateCommittedResource(&heapProps, D3D12_HEAP_FLAG_NONE, &desc, D3D12_RESOURCE_STATE_COPY_DEST, nullptr, IID_PPV_ARGS(&buffer));
+	device->CreateCommittedResource(&heapProps, D3D12_HEAP_FLAG_NONE, &desc, D3D12_RESOURCE_STATE_COMMON, nullptr, IID_PPV_ARGS(&buffer));
 	
 	heapProps = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
-	ComPtr<ID3D12Resource> uploadBuffer;
+	ComPtr<ID3D12Resource> uploadBuffer = getUploadHeap(size);
 
 	BYTE* pData = nullptr;
 	CD3DX12_RANGE readRange(0, 0); 
@@ -79,5 +73,14 @@ ComPtr<ID3D12Resource>  ModuleResources::CreateDefaultBuffer(const void* data, s
 	commandAllocator->Reset();
 	commandList->Reset(commandAllocator.Get(), nullptr);
 
+	return buffer;
+}
+
+ComPtr<ID3D12Resource> ModuleResources::getUploadHeap(size_t size)
+{
+	ComPtr<ID3D12Resource> buffer;
+	D3D12_RESOURCE_DESC desc = CD3DX12_RESOURCE_DESC::Buffer(size);
+	CD3DX12_HEAP_PROPERTIES uploadHeap = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_UPLOAD);
+	device->CreateCommittedResource(&uploadHeap, D3D12_HEAP_FLAG_NONE, &desc, D3D12_RESOURCE_STATE_GENERIC_READ, nullptr, IID_PPV_ARGS(&buffer));
 	return buffer;
 }
