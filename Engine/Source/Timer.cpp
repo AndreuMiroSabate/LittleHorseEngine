@@ -1,16 +1,27 @@
 #include "Globals.h"
 #include "Timer.h"
 
-std::chrono::time_point<Timer> Timer::now()
+Timer::Timer()
 {
-    LARGE_INTEGER ticks;
-	QueryPerformanceCounter(&ticks);
-
-
-	return time_point(duration);
+	m_running = false;
 }
 
-LARGE_INTEGER Timer::count()
+void Timer::Start()
 {
-	return ;
+	m_start = clock::now();
+	m_running = true;
 }
+
+void Timer::Stop()
+{
+	m_end = clock::now();
+	m_running = false;
+}
+
+double Timer::GetMilliseconds() const
+{
+	return GetDuration<std::chrono::milliseconds>();
+}
+
+
+

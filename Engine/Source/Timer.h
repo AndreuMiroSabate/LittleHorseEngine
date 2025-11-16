@@ -5,16 +5,33 @@
 class Timer
 {
 public:
+    Timer();
 
-	std::chrono::time_point<Timer> now() noexcept;
-	LARGE_INTEGER count();
+    void Start();
+
+    void Stop();
+
+    double GetMilliseconds() const;
+
 
 private:
+    using clock = std::chrono::steady_clock;
 
-	double  rep;
-	const bool Is_steady = true;
-	using time_point = std::chrono::time_point<Timer>;
-	std::ratio<1> period;
-	std::chrono::duration<float, std::ratio<1>> duration;
+    std::chrono::time_point<clock> m_start;
+    std::chrono::time_point<clock> m_end;
+    bool m_running;
+
+    template<typename TDuration>
+    double GetDuration() const
+    {
+        if (m_running)
+        {
+            return std::chrono::duration_cast<TDuration>(clock::now() - m_start).count();
+        }
+        else
+        {
+            return std::chrono::duration_cast<TDuration>(m_end - m_start).count();
+        }
+    }
 };
 
