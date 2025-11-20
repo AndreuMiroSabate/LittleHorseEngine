@@ -10,6 +10,10 @@ bool ModuleExercice2::init()
 	createVertexBuffer();
 	createRootSignature();
 	createPSO();
+
+	ModuleD3D12* d3d12 = app->getD3D12();
+
+	debugDraw = new DebugDrawPass(d3d12->getDevice(), d3d12->getCommandQueue());
 	return true;
 }
 
@@ -17,6 +21,9 @@ void ModuleExercice2::render()
 {
 	ModuleD3D12* d3d12 = app->getD3D12();
 	ID3D12GraphicsCommandList* commandList = d3d12->getCommandList();
+
+	dd::xzSquareGrid(-10.0f, 10.0f, 0.0f, 1.0f, dd::colors::LightGray);
+	dd::axisTriad(ddConvert(Matrix::Identity), 0.1f, 1.0f);
 
 	Matrix model = Matrix::Identity;
 	Matrix view = Matrix::CreateLookAt(Vector3(0.0f, 10.0f, 10.0f), Vector3::Zero, Vector3::Up);
@@ -30,6 +37,8 @@ void ModuleExercice2::render()
 	float fov = XM_PIDIV4;
 
 	Matrix proj = Matrix::CreatePerspectiveFieldOfView(fov, aspect, 0.1f, 1000.0f);
+
+	debugDraw->record(commandList, width, height, view,	proj);
 
 	commandList->Reset(d3d12->getCommandAllocator(), pipelineState.Get());
 
@@ -141,4 +150,9 @@ void ModuleExercice2::createPSO()
 
 	app->getD3D12()->getDevice()->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&pipelineState));
 
+}
+
+void ModuleExercice2::createDepthBuffer()
+{
+	CD3DX12_HEAP_PROPERTIES heapProp = CD3DX12_HEAP_PROPERTIES(D3D12_HEAP_TYPE_DEFAULT);
 }
