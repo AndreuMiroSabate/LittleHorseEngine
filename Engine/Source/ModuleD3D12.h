@@ -26,10 +26,12 @@ public:
 	void createSwapChain();
 	void createRenderTargets();
 	void createdrawFence();
+	void createDepthStencilBuffer();
 	void resize();
 	void flush();
 
 	D3D12_CPU_DESCRIPTOR_HANDLE getRenderTargetDescriptor();
+	D3D12_CPU_DESCRIPTOR_HANDLE getDepthStencilDescriptor();
 
 	HWND getHwnd() { return hWnd; }
 	ID3D12Device5* getDevice() { return device.Get(); }
@@ -56,6 +58,7 @@ private:
 	ComPtr<ID3D12DescriptorHeap> rtdescriptorHeap;
 	ComPtr<ID3D12DescriptorHeap> descriptorHeap;
 	ComPtr<ID3D12Fence> drawFence;
+	ComPtr<ID3D12Resource> depthStencilBuffer;
 
 	HANDLE drawFenceEvent = NULL;
 
