@@ -31,7 +31,7 @@ void ModuleExercice3::render()
 
 	Matrix model = createModelMatrix();
 	Matrix view = Matrix::CreateLookAt(
-		Vector3(0.0f, 0.0f, -5.0f),
+		Vector3(0.0f, 10.0f, 10.0f),
 		Vector3::Zero,
 		Vector3::Up
 	);
@@ -68,6 +68,8 @@ void ModuleExercice3::render()
 	commandList->SetGraphicsRootSignature(rootSignature.Get());
 	commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	commandList->IASetVertexBuffers(0, 1, &vertexBufferView);
+	commandList->SetGraphicsRoot32BitConstants(0, sizeof(XMMATRIX) / sizeof(UINT32), &mvp, 0);
+
 	commandList->DrawInstanced(3, 1, 0, 0);
 
 	dd::xzSquareGrid( - 10.0f, 10.0f, 0.0f, 1.0f, dd::colors::Gray);
@@ -75,7 +77,7 @@ void ModuleExercice3::render()
 
 	debugDrawPass->record(commandList, width, height, view, projection);
 
-	commandList->SetGraphicsRoot32BitConstants(0, sizeof(XMMATRIX) / sizeof(UINT32), &mvp, 0);
+	
 
 	barrier = CD3DX12_RESOURCE_BARRIER::Transition(
 		d3d12->getBackBuffers(),
@@ -103,7 +105,7 @@ void ModuleExercice3::createVertexBuffer()
 		{ 1.0f, -1.0f, 0.0f }
 	};
 
-	vertexBuffer = app->getResources()->CreateDefaultBuffer(vertices, sizeof(vertices), "Exercice2");
+	vertexBuffer = app->getResources()->CreateDefaultBuffer(vertices, sizeof(vertices), "Exercice3");
 
 	vertexBufferView.BufferLocation = vertexBuffer->GetGPUVirtualAddress();
 	vertexBufferView.SizeInBytes = sizeof(vertices);

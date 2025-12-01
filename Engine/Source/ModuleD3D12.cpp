@@ -249,9 +249,10 @@ void ModuleD3D12::resize()
 		windowWidth = width;
 		windowHeight = height;
 		flush();
-		for (unsigned int i = 0; i < FRAMES_IN_FLIGHT; ++i)
+		for (unsigned i = 0; i < FRAMES_IN_FLIGHT; ++i)
 		{
 			backBuffers[i].Reset();
+			drawFenceValues[i] = 0;
 		}
 
 		DXGI_SWAP_CHAIN_DESC swapChainDesc = {};
