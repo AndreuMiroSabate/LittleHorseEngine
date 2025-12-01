@@ -68,15 +68,6 @@ void ModuleD3D12::render()
 {
 	
 	CD3DX12_RESOURCE_BARRIER transitionBarrier;
-	/*transitionBarrier = CD3DX12_RESOURCE_BARRIER::Transition(
-		backBuffers[currentBackBufferIdx].Get(),
-		D3D12_RESOURCE_STATE_PRESENT,
-		D3D12_RESOURCE_STATE_RENDER_TARGET
-	);
-
-	comandList->ResourceBarrier(1, &transitionBarrier);
-	float clearColor[] = { 0.0f, 1.0f, 0.7f, 1.0f };
-	comandList->ClearRenderTargetView(getRenderTargetDescriptor(), clearColor, 0, nullptr);*/
 
 	transitionBarrier = CD3DX12_RESOURCE_BARRIER::Transition(
 		backBuffers[currentBackBufferIdx].Get(),
