@@ -70,7 +70,7 @@ void ModuleExercice4::render()
 	commandList->IASetVertexBuffers(0, 1, &vertexBufferView);
 	commandList->SetGraphicsRoot32BitConstants(0, sizeof(XMMATRIX) / sizeof(UINT32), &mvp, 0);
 
-	commandList->DrawInstanced(3, 1, 0, 0);
+	commandList->DrawInstanced(6, 1, 0, 0);
 
 	dd::xzSquareGrid(-10.0f, 10.0f, 0.0f, 1.0f, dd::colors::Gray);
 	dd::axisTriad(ddConvert(Matrix::Identity), 0.1f, 1.0f);
@@ -119,12 +119,21 @@ void ModuleExercice4::createVertexBuffer()
 
 bool ModuleExercice4::createRootSignature()
 {
-	CD3DX12_ROOT_SIGNATURE_DESC rootSignatureDesc = {};
-	CD3DX12_ROOT_PARAMETER rootParameters[1];
+	/*CD3DX12_ROOT_SIGNATURE_DESC rootSignatureDesc = {};
+	CD3DX12_ROOT_PARAMETER rootParameters[3];
 
 	rootParameters[0].InitAsConstants(sizeof(Matrix) / sizeof(UINT32), 0);
 
-	rootSignatureDesc.Init(1, rootParameters, 0, nullptr, D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
+	rootSignatureDesc.Init(1, rootParameters, 0, nullptr, D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);*/
+
+	CD3DX12_ROOT_SIGNATURE_DESC rootSignatureDesc;
+	CD3DX12_ROOT_PARAMETER rootParameters[2];
+	CD3DX12_DESCRIPTOR_RANGE tableRange;
+	tableRange.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0, 0);
+	rootParameters[0].InitAsConstants((sizeof(Matrix) / sizeof(UINT32)), 0, 0, D3D12_SHADER_VISIBILITY_VERTEX); 
+	rootParameters[1].InitAsDescriptorTable(1, &tableRange, D3D12_SHADER_VISIBILITY_PIXEL); 
+	rootSignatureDesc.Init(2, rootParameters, 0, nullptr, D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
+
 	ComPtr<ID3DBlob> blob;
 
 	if (FAILED(D3D12SerializeRootSignature(&rootSignatureDesc, D3D_ROOT_SIGNATURE_VERSION_1, &blob, nullptr)))
@@ -141,16 +150,14 @@ void ModuleExercice4::createPSO()
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc = {};
 	psoDesc.pRootSignature = rootSignature.Get();
 
-	auto dataVS = DX::ReadData(L"Exercice3VS.cso");
-	auto dataPS = DX::ReadData(L"Exercice3PS.cso");
+	auto dataVS = DX::ReadData(L"Exercise4VS.cso");
+	auto dataPS = DX::ReadData(L"Exercise4PS.cso");
 
 	psoDesc.VS = { dataVS.data(), dataVS.size() };
 	psoDesc.PS = { dataPS.data(), dataPS.size() };
 
-	D3D12_INPUT_ELEMENT_DESC inputLayout[] =
-	{
-		{ "POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0 },
-	};
+	D3D12_INPUT_ELEMENT_DESC inputLayout[] = { {"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
+											  {"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0} };
 
 	psoDesc.InputLayout = { inputLayout, sizeof(inputLayout) / sizeof(D3D12_INPUT_ELEMENT_DESC) };
 

@@ -16,6 +16,7 @@ public:
     ComPtr<ID3D12Resource> CreateUploadBuffer(const void* data, size_t size, const char* name);
     ComPtr<ID3D12Resource> CreateDefaultBuffer(const void* data, size_t size, const char* name);
     ComPtr<ID3D12Resource> getUploadHeap(size_t size);
+    ComPtr<ID3D12Resource> createTextureFromFile(const wchar_t* filename);
 
 private:
 
