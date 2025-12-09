@@ -1,5 +1,6 @@
 #include "Globals.h"
 #include "ModuleExercice4.h"
+#include "ModuleSamplers.h"
 #include "Application.h"
 #include "ReadData.h"
 
@@ -15,6 +16,10 @@ bool ModuleExercice4::init()
 	createRootSignature();
 	createPSO();
 	ModuleD3D12* d3d12 = app->getD3D12();
+	ModuleResources* resource = app->getResources();
+	
+	dogTexture = resource->createTextureFromFile(L"Assets/Textures/dog.dds");
+
 	debugDrawPass = std::make_unique<DebugDrawPass>(d3d12->getDevice(), d3d12->getCommandQueue());
 	return true;
 }
@@ -25,7 +30,7 @@ void ModuleExercice4::render()
 	ID3D12GraphicsCommandList* commandList = d3d12->getCommandList();
 
 	ID3D12DescriptorHeap* srvHeap;
-	ID3D12DescriptorHeap* samplesHeap;
+	ModuleSamplers* samplesHeap = app->getSamplers();
 
 	unsigned width, height;
 	d3d12->getWindowSize(width, height);
@@ -72,11 +77,12 @@ void ModuleExercice4::render()
 	commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	commandList->IASetVertexBuffers(0, 1, &vertexBufferView);
 
-	/*ID3D12DescriptorHeap* descriptorHeaps[] = { srvHeap, samplesHeap };
+	/*ID3D12DescriptorHeap* descriptorHeaps[] = { srvHeap, samplesHeap->getHeap()};
 	commandList->SetDescriptorHeaps(2, descriptorHeaps);*/
 
 	commandList->SetGraphicsRoot32BitConstants(0, sizeof(XMMATRIX) / sizeof(UINT32), &mvp, 0);
 	//commandList->SetGraphicsRootDescriptorTable(1, )
+	/*commandList->SetGraphicsRootDescriptorTable(2, samplesHeap->GetGPUHandle())*/
 
 	commandList->DrawInstanced(6, 1, 0, 0);
 
@@ -135,12 +141,17 @@ bool ModuleExercice4::createRootSignature()
 	rootSignatureDesc.Init(1, rootParameters, 0, nullptr, D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);*/
 
 	CD3DX12_ROOT_SIGNATURE_DESC rootSignatureDesc;
-	CD3DX12_ROOT_PARAMETER rootParameters[2];
+	CD3DX12_ROOT_PARAMETER rootParameters[3];
 	CD3DX12_DESCRIPTOR_RANGE tableRange;
+	CD3DX12_DESCRIPTOR_RANGE samplesRange;
+
 	tableRange.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0, 0);
+	samplesRange.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SAMPLER, 1, 0);
+
 	rootParameters[0].InitAsConstants((sizeof(Matrix) / sizeof(UINT32)), 0, 0, D3D12_SHADER_VISIBILITY_VERTEX); 
-	rootParameters[1].InitAsDescriptorTable(1, &tableRange, D3D12_SHADER_VISIBILITY_PIXEL); 
-	rootSignatureDesc.Init(2, rootParameters, 0, nullptr, D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
+	rootParameters[1].InitAsDescriptorTable(1, &tableRange, D3D12_SHADER_VISIBILITY_PIXEL);
+	rootParameters[2].InitAsDescriptorTable(2, &samplesRange, D3D12_SHADER_VISIBILITY_PIXEL);
+	rootSignatureDesc.Init(3, rootParameters, 0, nullptr, D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
 
 	ComPtr<ID3DBlob> blob;
 

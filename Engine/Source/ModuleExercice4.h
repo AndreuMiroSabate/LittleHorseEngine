@@ -22,6 +22,7 @@ private:
     D3D12_VERTEX_BUFFER_VIEW vertexBufferView;
     ComPtr<ID3D12PipelineState> pipelineState;
     ComPtr<ID3D12RootSignature> rootSignature;
+    ComPtr<ID3D12Resource> dogTexture;
     std::unique_ptr<DebugDrawPass> debugDrawPass;
 
 };

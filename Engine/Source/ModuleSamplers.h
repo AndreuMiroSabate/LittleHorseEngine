@@ -18,6 +18,8 @@ public:
 
     void CreateDefaultSamplers(ID3D12Device* device);
 
+    ID3D12DescriptorHeap* getHeap() { samplerHeap.Get(); }
+
 private:
     ComPtr<ID3D12DescriptorHeap> samplerHeap;
     UINT samplerDescriptorSize;

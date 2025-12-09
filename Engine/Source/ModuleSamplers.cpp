@@ -37,7 +37,7 @@ void ModuleSamplers::CreateDefaultSamplers(ID3D12Device* device) {
 			D3D12_COMPARISON_FUNC_ALWAYS,
 			{ 0, 0, 0, 0 },
 			0.0f, D3D12_FLOAT32_MAX
-		}
+		},
 	};
 	for (int i = 0; i < std::size(samplers); i++) {
 		device->CreateSampler(&samplers[i], cpuHandle);

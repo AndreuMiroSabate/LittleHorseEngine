@@ -13,7 +13,7 @@ ModuleShaderDescriptors::~ModuleShaderDescriptors()
 
 bool ModuleShaderDescriptors::init()
 {
-	createSRV();
+	//createSRV();
 	return true;
 }
 

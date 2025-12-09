@@ -9,6 +9,7 @@
 class Module;
 class ModuleD3D12;
 class ModuleResources;
+class ModuleSamplers;
 
 class Application
 {
@@ -24,6 +25,7 @@ public:
 
     ModuleD3D12* getD3D12() { return d3d12; }
     ModuleResources* getResources() { return resources; }
+    ModuleSamplers* getSamplers() { return samplers; }
 
     void requestBrowser(const char* url);
 
@@ -43,6 +45,7 @@ private:
 
 	ModuleD3D12* d3d12 = nullptr;
     ModuleResources* resources = nullptr;
+    ModuleSamplers* samplers = nullptr;
 
     uint64_t  lastMilis = 0;
     TickList  tickList;
