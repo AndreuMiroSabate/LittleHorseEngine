@@ -24,6 +24,9 @@ void ModuleExercice4::render()
 	ModuleD3D12* d3d12 = app->getD3D12();
 	ID3D12GraphicsCommandList* commandList = d3d12->getCommandList();
 
+	ID3D12DescriptorHeap* srvHeap;
+	ID3D12DescriptorHeap* samplesHeap;
+
 	unsigned width, height;
 	d3d12->getWindowSize(width, height);
 
@@ -68,7 +71,12 @@ void ModuleExercice4::render()
 	commandList->SetGraphicsRootSignature(rootSignature.Get());
 	commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	commandList->IASetVertexBuffers(0, 1, &vertexBufferView);
+
+	/*ID3D12DescriptorHeap* descriptorHeaps[] = { srvHeap, samplesHeap };
+	commandList->SetDescriptorHeaps(2, descriptorHeaps);*/
+
 	commandList->SetGraphicsRoot32BitConstants(0, sizeof(XMMATRIX) / sizeof(UINT32), &mvp, 0);
+	//commandList->SetGraphicsRootDescriptorTable(1, )
 
 	commandList->DrawInstanced(6, 1, 0, 0);
 
