@@ -13,19 +13,12 @@ ModuleShaderDescriptors::~ModuleShaderDescriptors()
 
 bool ModuleShaderDescriptors::init()
 {
-	//createSRV();
-	return true;
-}
-
-
-
-void ModuleShaderDescriptors::createSRV()
-{
 	ModuleD3D12* d3d12 = app->getD3D12();
 	ID3D12Device2* device = d3d12->getDevice();
 
 
 	D3D12_DESCRIPTOR_HEAP_DESC heapDesc = {};
+	heapDesc.NumDescriptors = NUM_DESCRIPTORS* DESCRIPTORS_PER_TABLE;
 	heapDesc.Flags = D3D12_DESCRIPTOR_HEAP_FLAG_SHADER_VISIBLE;
 	heapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV;
 
@@ -35,4 +28,58 @@ void ModuleShaderDescriptors::createSRV()
 
 	cpuHandle = heap->GetCPUDescriptorHandleForHeapStart();
 	gpuHandle = heap->GetGPUDescriptorHandleForHeapStart();
+
+	for (uint32_t i = 0; i < descriptorSize; i++)
+		freeHandles.push_back(i);
+
+	//createSRV();
+	return true;
 }
+
+
+void ModuleShaderDescriptors::createSRV(ID3D12Resource* resource, UINT8 slot)
+{
+	if (resource)
+	{
+		app->getD3D12()->getDevice()->CreateShaderResourceView(
+			resource,
+			nullptr,
+			this->getCPUHandle(slot));
+	}
+}
+
+UINT ModuleShaderDescriptors::allocteDescriptor()
+{
+	assert(!freeHandles.empty());
+	UINT index = freeHandles.back();
+	freeHandles.pop_back();
+	return index;
+}
+
+void ModuleShaderDescriptors::freeDescriptor(UINT index)
+{
+	freeHandles.push_back(index);
+}
+
+D3D12_CPU_DESCRIPTOR_HANDLE ModuleShaderDescriptors::getCPUHandle(UINT index)
+{
+	D3D12_CPU_DESCRIPTOR_HANDLE handle = heap->GetCPUDescriptorHandleForHeapStart();
+	handle.ptr += index * app->getD3D12()->getDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+	
+	return handle;
+}
+
+D3D12_GPU_DESCRIPTOR_HANDLE ModuleShaderDescriptors::getGPUHandle(UINT index)
+{
+	D3D12_GPU_DESCRIPTOR_HANDLE handle = heap->GetGPUDescriptorHandleForHeapStart();
+	handle.ptr += index * app->getD3D12()->getDevice()->GetDescriptorHandleIncrementSize(D3D12_DESCRIPTOR_HEAP_TYPE_CBV_SRV_UAV);
+	return handle;
+}
+
+void ModuleShaderDescriptors::resetDescriptors()
+{
+	freeHandles.clear();
+	for (uint32_t i = 0; i < NUM_DESCRIPTORS * DESCRIPTORS_PER_TABLE; i++)
+		freeHandles.push_back(i);
+}
+

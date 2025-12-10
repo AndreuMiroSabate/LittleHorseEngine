@@ -1,6 +1,7 @@
 #include "Globals.h"
 #include "ModuleExercice4.h"
 #include "ModuleSamplers.h"
+#include "ModuleShaderDescriptors.h"
 #include "Application.h"
 #include "ReadData.h"
 
@@ -17,8 +18,11 @@ bool ModuleExercice4::init()
 	createPSO();
 	ModuleD3D12* d3d12 = app->getD3D12();
 	ModuleResources* resource = app->getResources();
+	ModuleShaderDescriptors* shaderDescriptors = app->getShaderDescriptors();
 	
 	dogTexture = resource->createTextureFromFile(L"Assets/Textures/dog.dds");
+	dogTextureDescriptorIndex = shaderDescriptors->allocteDescriptor();
+	shaderDescriptors->createSRV(dogTexture.Get(), dogTextureDescriptorIndex);
 
 	debugDrawPass = std::make_unique<DebugDrawPass>(d3d12->getDevice(), d3d12->getCommandQueue());
 	return true;
@@ -31,6 +35,7 @@ void ModuleExercice4::render()
 
 	ID3D12DescriptorHeap* srvHeap;
 	ModuleSamplers* samplesHeap = app->getSamplers();
+	ModuleShaderDescriptors* shaderDescriptors = app->getShaderDescriptors();
 
 	unsigned width, height;
 	d3d12->getWindowSize(width, height);
@@ -77,12 +82,12 @@ void ModuleExercice4::render()
 	commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	commandList->IASetVertexBuffers(0, 1, &vertexBufferView);
 
-	/*ID3D12DescriptorHeap* descriptorHeaps[] = { srvHeap, samplesHeap->getHeap()};
-	commandList->SetDescriptorHeaps(2, descriptorHeaps);*/
+	ID3D12DescriptorHeap* descriptorHeaps[] = { shaderDescriptors->getDescriptorHeap(), samplesHeap->getHeap()};
+	commandList->SetDescriptorHeaps(2, descriptorHeaps);
 
 	commandList->SetGraphicsRoot32BitConstants(0, sizeof(XMMATRIX) / sizeof(UINT32), &mvp, 0);
-	//commandList->SetGraphicsRootDescriptorTable(1, )
-	/*commandList->SetGraphicsRootDescriptorTable(2, samplesHeap->GetGPUHandle())*/
+	commandList->SetGraphicsRootDescriptorTable(1, shaderDescriptors->getGPUHandle(dogTextureDescriptorIndex));
+	commandList->SetGraphicsRootDescriptorTable(2, samplesHeap->GetGPUHandle(samplerIndex));
 
 	commandList->DrawInstanced(6, 1, 0, 0);
 
@@ -141,16 +146,17 @@ bool ModuleExercice4::createRootSignature()
 	rootSignatureDesc.Init(1, rootParameters, 0, nullptr, D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);*/
 
 	CD3DX12_ROOT_SIGNATURE_DESC rootSignatureDesc;
-	CD3DX12_ROOT_PARAMETER rootParameters[3];
+	CD3DX12_ROOT_PARAMETER rootParameters[3] = {};
 	CD3DX12_DESCRIPTOR_RANGE tableRange;
 	CD3DX12_DESCRIPTOR_RANGE samplesRange;
 
 	tableRange.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0, 0);
-	samplesRange.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SAMPLER, 1, 0);
+	samplesRange.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SAMPLER, 2, 0);
 
 	rootParameters[0].InitAsConstants((sizeof(Matrix) / sizeof(UINT32)), 0, 0, D3D12_SHADER_VISIBILITY_VERTEX); 
 	rootParameters[1].InitAsDescriptorTable(1, &tableRange, D3D12_SHADER_VISIBILITY_PIXEL);
-	rootParameters[2].InitAsDescriptorTable(2, &samplesRange, D3D12_SHADER_VISIBILITY_PIXEL);
+	rootParameters[2].InitAsDescriptorTable(1, &samplesRange, D3D12_SHADER_VISIBILITY_PIXEL);
+
 	rootSignatureDesc.Init(3, rootParameters, 0, nullptr, D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
 
 	ComPtr<ID3DBlob> blob;
@@ -167,7 +173,7 @@ bool ModuleExercice4::createRootSignature()
 void ModuleExercice4::createPSO()
 {
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc = {};
-	psoDesc.pRootSignature = rootSignature.Get();
+	
 
 	auto dataVS = DX::ReadData(L"Exercise4VS.cso");
 	auto dataPS = DX::ReadData(L"Exercise4PS.cso");
@@ -179,7 +185,7 @@ void ModuleExercice4::createPSO()
 											  {"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0} };
 
 	psoDesc.InputLayout = { inputLayout, sizeof(inputLayout) / sizeof(D3D12_INPUT_ELEMENT_DESC) };
-
+	psoDesc.pRootSignature = rootSignature.Get();
 	psoDesc.PrimitiveTopologyType = D3D12_PRIMITIVE_TOPOLOGY_TYPE_TRIANGLE;
 	psoDesc.RTVFormats[0] = DXGI_FORMAT_R8G8B8A8_UNORM;
 	psoDesc.DSVFormat = DXGI_FORMAT_D32_FLOAT;

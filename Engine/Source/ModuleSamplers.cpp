@@ -13,7 +13,7 @@ void ModuleSamplers::init(ID3D12Device* device) {
 
 void ModuleSamplers::CreateDefaultSamplers(ID3D12Device* device) {
 	D3D12_CPU_DESCRIPTOR_HANDLE cpuHandle = samplerHeap->GetCPUDescriptorHandleForHeapStart();
-	D3D12_SAMPLER_DESC samplers[] = {
+	D3D12_SAMPLER_DESC samplers[2] = {
 		// 1. Linear Wrap Sampler
 		{
 			D3D12_FILTER_MIN_MAG_MIP_LINEAR, 

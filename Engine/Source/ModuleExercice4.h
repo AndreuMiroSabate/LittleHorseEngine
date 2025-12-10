@@ -23,7 +23,10 @@ private:
     ComPtr<ID3D12PipelineState> pipelineState;
     ComPtr<ID3D12RootSignature> rootSignature;
     ComPtr<ID3D12Resource> dogTexture;
+	UINT dogTextureDescriptorIndex;
     std::unique_ptr<DebugDrawPass> debugDrawPass;
+
+	int samplerIndex = 0;
 
 };
 
