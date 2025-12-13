@@ -15,8 +15,8 @@ Application::Application(int argc, wchar_t** argv, void* hWnd)
     modules.push_back(new ModuleInput((HWND)hWnd));
     modules.push_back(d3d12 = new ModuleD3D12((HWND)hWnd));
     modules.push_back(resources = new ModuleResources());
-    modules.push_back(new ModuleSamplers());
-	modules.push_back(new ModuleShaderDescriptors());
+    modules.push_back(samplers = new ModuleSamplers());
+	modules.push_back(shaderDescriptors = new ModuleShaderDescriptors());
     //modules.push_back(new ModuleExercice3());
     modules.push_back(new ModuleExercice4());
     //modules.push_back(new ModuleEditor());

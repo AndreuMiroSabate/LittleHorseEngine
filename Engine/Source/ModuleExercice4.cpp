@@ -22,7 +22,7 @@ bool ModuleExercice4::init()
 	
 	dogTexture = resource->createTextureFromFile(L"Assets/Textures/dog.dds");
 	dogTextureDescriptorIndex = shaderDescriptors->allocteDescriptor();
-	shaderDescriptors->createSRV(dogTexture.Get(), dogTextureDescriptorIndex);
+	shaderDescriptors->createSRV(dogTexture.Get(), 0);  //For this exercise is good, but an scalable version is needed for more textures
 
 	debugDrawPass = std::make_unique<DebugDrawPass>(d3d12->getDevice(), d3d12->getCommandQueue());
 	return true;
@@ -86,8 +86,8 @@ void ModuleExercice4::render()
 	commandList->SetDescriptorHeaps(2, descriptorHeaps);
 
 	commandList->SetGraphicsRoot32BitConstants(0, sizeof(XMMATRIX) / sizeof(UINT32), &mvp, 0);
-	commandList->SetGraphicsRootDescriptorTable(1, shaderDescriptors->getGPUHandle(dogTextureDescriptorIndex));
-	commandList->SetGraphicsRootDescriptorTable(2, samplesHeap->GetGPUHandle(samplerIndex));
+	commandList->SetGraphicsRootDescriptorTable(1, shaderDescriptors->getDescriptorHeap()->GetGPUDescriptorHandleForHeapStart());
+	commandList->SetGraphicsRootDescriptorTable(2, samplesHeap->getHeap()->GetGPUDescriptorHandleForHeapStart());
 
 	commandList->DrawInstanced(6, 1, 0, 0);
 
@@ -150,7 +150,7 @@ bool ModuleExercice4::createRootSignature()
 	CD3DX12_DESCRIPTOR_RANGE tableRange;
 	CD3DX12_DESCRIPTOR_RANGE samplesRange;
 
-	tableRange.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0, 0);
+	tableRange.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0);
 	samplesRange.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SAMPLER, 2, 0);
 
 	rootParameters[0].InitAsConstants((sizeof(Matrix) / sizeof(UINT32)), 0, 0, D3D12_SHADER_VISIBILITY_VERTEX); 

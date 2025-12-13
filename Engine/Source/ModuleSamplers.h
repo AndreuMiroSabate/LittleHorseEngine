@@ -4,7 +4,8 @@ class ModuleSamplers :
     public Module
 {
 public:
-    void init(ID3D12Device* device);
+    
+    bool init() override;
 
 
     D3D12_CPU_DESCRIPTOR_HANDLE GetCPUHandle(int index) {
