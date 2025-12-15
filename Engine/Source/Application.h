@@ -11,6 +11,7 @@ class ModuleD3D12;
 class ModuleResources;
 class ModuleSamplers;
 class ModuleShaderDescriptors;
+class ModuleCamara;
 
 class Application
 {
@@ -28,6 +29,7 @@ public:
     ModuleResources* getResources() { return resources; }
     ModuleSamplers* getSamplers() { return samplers; }
     ModuleShaderDescriptors* getShaderDescriptors() { return shaderDescriptors; }
+	ModuleCamara* getCamara() { return camara; }
 
     void requestBrowser(const char* url);
 
@@ -49,6 +51,7 @@ private:
     ModuleResources* resources = nullptr;
     ModuleSamplers* samplers = nullptr;
 	ModuleShaderDescriptors* shaderDescriptors = nullptr;
+	ModuleCamara* camara = nullptr;
 
     uint64_t  lastMilis = 0;
     TickList  tickList;

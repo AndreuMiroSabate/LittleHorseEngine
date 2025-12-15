@@ -8,6 +8,7 @@
 #include "ModuleExercice4.h"
 #include "ModuleSamplers.h"
 #include "ModuleShaderDescriptors.h"
+#include "ModuleCamara.h"
 
 
 Application::Application(int argc, wchar_t** argv, void* hWnd)
@@ -19,6 +20,7 @@ Application::Application(int argc, wchar_t** argv, void* hWnd)
 	modules.push_back(shaderDescriptors = new ModuleShaderDescriptors());
     //modules.push_back(new ModuleExercice3());
     modules.push_back(new ModuleExercice4());
+	modules.push_back(camara = new ModuleCamara());
     //modules.push_back(new ModuleEditor());
 	
 }
