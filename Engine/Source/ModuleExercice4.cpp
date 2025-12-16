@@ -26,17 +26,30 @@ bool ModuleExercice4::init()
 	shaderDescriptors->createSRV(dogTexture.Get(), 0);  //For this exercise is good, but an scalable version is needed for more textures
 
 	debugDrawPass = std::make_unique<DebugDrawPass>(d3d12->getDevice(), d3d12->getCommandQueue());
+	imGuiPass = std::make_unique<ImGuiPass>(d3d12->getDevice(), d3d12->getHwnd());
 	return true;
+}
+
+void ModuleExercice4::preRender()
+{
+	imGuiPass->startFrame();
 }
 
 void ModuleExercice4::render()
 {
+
 	ModuleD3D12* d3d12 = app->getD3D12();
 	ID3D12GraphicsCommandList* commandList = d3d12->getCommandList();
 
 	ID3D12DescriptorHeap* srvHeap;
 	ModuleSamplers* samplesHeap = app->getSamplers();
 	ModuleShaderDescriptors* shaderDescriptors = app->getShaderDescriptors();
+
+	ImGui::SetNextWindowSize(ImVec2(300, 200), ImGuiCond_FirstUseEver);
+	ImGui::Begin("Texture Viewer Options");
+	ImGui::Checkbox("Show grid", &showGrid);
+	ImGui::Checkbox("Show axis", &showAxis);
+	ImGui::End();
 
 	unsigned width, height;
 	d3d12->getWindowSize(width, height);
@@ -91,12 +104,18 @@ void ModuleExercice4::render()
 
 	commandList->DrawInstanced(6, 1, 0, 0);
 
-	dd::xzSquareGrid(-10.0f, 10.0f, 0.0f, 1.0f, dd::colors::Gray);
-	dd::axisTriad(ddConvert(Matrix::Identity), 0.1f, 1.0f);
+
+	if (showGrid)
+	{
+		dd::xzSquareGrid(-10.0f, 10.0f, 0.0f, 1.0f, dd::colors::Gray);
+	}
+	if (showAxis)
+	{
+		dd::axisTriad(ddConvert(Matrix::Identity), 0.1f, 1.0f);
+	}
 
 	debugDrawPass->record(commandList, width, height, view, projection);
-
-
+	imGuiPass->record(commandList, d3d12->getRenderTargetDescriptor());
 
 	barrier = CD3DX12_RESOURCE_BARRIER::Transition(
 		d3d12->getBackBuffers(),

@@ -23,17 +23,11 @@ bool ModuleEditor::postInit()
 void ModuleEditor::preRender()
 {
 	imguiPass->startFrame();
-	if (showDemoWindow)
-	{
-		ImGui::ShowDemoWindow();
-	}
-	//draw();
-	mainMenuBar();
-	//ImGui::Text("Hello, Editor!");
 }
 
 void ModuleEditor::render()
 {
+	draw();
 	imguiPass->record(d3d12->getCommandList(), d3d12->getRenderTargetDescriptor());
 	//draw();
 }

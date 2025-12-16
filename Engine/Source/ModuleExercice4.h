@@ -2,12 +2,14 @@
 #include "Module.h"
 #include "ModuleResources.h"
 #include "DebugDrawPass.h"
+#include "ImGuiPass.h"
 
 class ModuleExercice4 :
     public Module
 {
 public:
     bool init() override;
+	void preRender() override;
     void render() override;
 
     void createVertexBuffer();
@@ -25,6 +27,11 @@ private:
     ComPtr<ID3D12Resource> dogTexture;
 	UINT dogTextureDescriptorIndex;
     std::unique_ptr<DebugDrawPass> debugDrawPass;
+    std::unique_ptr<ImGuiPass> imGuiPass;
+
+	bool showGrid = true;
+	bool showAxis = true;
+
 
 	int samplerIndex = 0;
 
