@@ -15,8 +15,8 @@ ModuleCamara::~ModuleCamara()
 
 bool ModuleCamara::init()
 {
-	position = Vector3(0.0f, 5.0f, 5.0f);
-	orientation = Quaternion::CreateFromAxisAngle(Vector3::Up, 45.0f);
+	position = Vector3(0.0f, 2.0f, 10.0f);
+	orientation = Quaternion::CreateFromAxisAngle(Vector3::Up, 0.0f);
 	pivotPoint = Vector3::Zero;
 	lookAt = Vector3::Zero;
 
@@ -127,9 +127,16 @@ void ModuleCamara::update()
 
 	}
 
+
 	position += translation;
 
 	pivotPoint = position + forward * distanceToPivot;
+
+	if (kbState.IsKeyDown(Keyboard::Keys::F))
+	{
+		pivotPoint = lookAt;
+		position = pivotPoint - forward * distanceToPivot;
+	}
 
 	Quaternion inverseOrientation;
 	orientation.Inverse(inverseOrientation);
