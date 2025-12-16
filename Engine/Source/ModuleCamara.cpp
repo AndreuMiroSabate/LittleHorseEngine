@@ -37,7 +37,7 @@ bool ModuleCamara::init()
 	viewMatrix = Matrix::CreateFromQuaternion(inverseOrientation);
 	viewMatrix.Translation(-position);
 
-	viewMatrix = Matrix::CreateLookAt(position, lookAt, Vector3::Up);
+	viewMatrix = Matrix::CreateLookAt(position, pivotPoint, Vector3::Up);
 
 	return true;
 }
@@ -64,7 +64,7 @@ void ModuleCamara::update()
 		speed *= 5.0f;
 	}
 
-	if(mouseState.leftButton)
+	if(mouseState.rightButton)
 	{
 		if (!isDragging)
 		{
@@ -129,13 +129,16 @@ void ModuleCamara::update()
 
 	if (mouseState.scrollWheelValue > scrollValue)
 	{
-		distanceToPivot -= 1;
-		position = pivotPoint - forward * distanceToPivot;
-		scrollValue = mouseState.scrollWheelValue;
+		if(distanceToPivot > 1)
+		{
+			distanceToPivot -= 1.f;
+			position = pivotPoint - forward * distanceToPivot;
+			scrollValue = mouseState.scrollWheelValue;
+		}
 	}
 	if (mouseState.scrollWheelValue < scrollValue)
 	{
-		distanceToPivot += 1;
+		distanceToPivot += 1.f;
 		position = pivotPoint - forward * distanceToPivot;
 		scrollValue = mouseState.scrollWheelValue;
 	}

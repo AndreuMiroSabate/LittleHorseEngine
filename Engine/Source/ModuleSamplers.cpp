@@ -20,7 +20,7 @@ bool ModuleSamplers::init() {
 
 void ModuleSamplers::CreateDefaultSamplers(ID3D12Device* device) {
 	D3D12_CPU_DESCRIPTOR_HANDLE cpuHandle = samplerHeap->GetCPUDescriptorHandleForHeapStart();
-	D3D12_SAMPLER_DESC samplers[2] = {
+	D3D12_SAMPLER_DESC samplers[4] = {
 		// 1. Linear Wrap Sampler
 		{
 			D3D12_FILTER_MIN_MAG_MIP_LINEAR, 
@@ -44,7 +44,32 @@ void ModuleSamplers::CreateDefaultSamplers(ID3D12Device* device) {
 			D3D12_COMPARISON_FUNC_NONE,
 			{ 0, 0, 0, 0 },
 			0.0f, D3D12_FLOAT32_MAX
+		}, 
+		//3. Linear Clamp Sampler
+		{
+			D3D12_FILTER_MIN_MAG_MIP_LINEAR,
+			D3D12_TEXTURE_ADDRESS_MODE_CLAMP,
+			D3D12_TEXTURE_ADDRESS_MODE_CLAMP,
+			D3D12_TEXTURE_ADDRESS_MODE_CLAMP,
+			0.0f,
+			16,
+			D3D12_COMPARISON_FUNC_NONE,
+			{ 0, 0, 0, 0 },
+			0.0f, D3D12_FLOAT32_MAX
+
 		},
+		//4. Point Wrap Sampler
+		{
+			D3D12_FILTER_MIN_MAG_MIP_POINT,
+			D3D12_TEXTURE_ADDRESS_MODE_WRAP,
+			D3D12_TEXTURE_ADDRESS_MODE_WRAP,
+			D3D12_TEXTURE_ADDRESS_MODE_WRAP,
+			0.0f,
+			16,
+			D3D12_COMPARISON_FUNC_NONE,
+			{ 0, 0, 0, 0 },
+			0.0f, D3D12_FLOAT32_MAX
+		}
 	};
 	for (int i = 0; i < std::size(samplers); i++) {
 		device->CreateSampler(&samplers[i], cpuHandle);
