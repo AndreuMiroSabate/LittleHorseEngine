@@ -44,13 +44,10 @@ void ModuleExercice4::render()
 	commandList->Reset(d3d12->getCommandAllocator(), pipelineState.Get());
 
 	Matrix model = createModelMatrix();
-	/*Matrix view = Matrix::CreateLookAt(
-		Vector3(0.0f, 10.0f, 10.0f),
-		Vector3::Zero,
-		Vector3::Up
-	);*/
 
 	Matrix view = app->getCamara()->GetViewMatrix();
+
+	app->getCamara()->SetLookAt(Vector3::Zero);
 
 	float aspectRatio = float(width) / float(height);
 	float fovY = XM_PIDIV4;

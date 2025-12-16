@@ -11,11 +11,13 @@ public:
     void update() override;
 	bool cleanUp() override;
 
+	float Clamp(float value, float min, float max);
+
 	void SetFOV(float v_fov);
 	void SetAspectRatio(float v_aspectRatio);
 	void SetPlaneDistances(float v_nearPlane, float v_farPlane);
 	void SetPosition(float x, float y, float z);
-	void SetLookAt(float x, float y, float z);
+	void SetLookAt(Vector3 point);
 	void SetOrientation(float v_pitch, float v_yaw, float v_roll);
 	Matrix GetViewMatrix() const;
 	void GetProjectionMatrix(Matrix* matrix) const;
@@ -26,16 +28,31 @@ public:
 	float aspectRatio;
 	float nearPlane;
 	float farPlane;
-	Vector3 position;
-	Quaternion orientation;
+	
+	
 	Vector3 lookAt;
-	float pitch;
-	float yaw;
 	float roll;
 	Matrix viewMatrix;
 	Matrix projectionMatrix;
 
 	float dragX;
 	float dragY;
+
+	float scrollValue;
+
+	Vector3 pivotPoint;
+	float distanceToPivot;
+	float yaw;
+	float pitch;
+	Quaternion orientation;
+	Vector3 position;
+
+	int lastMouseX;
+	int lastMouseY;
+	bool isDragging = false;
+
+	float moveSpeed;
+
+
 };
 

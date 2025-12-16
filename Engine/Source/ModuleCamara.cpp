@@ -15,11 +15,21 @@ ModuleCamara::~ModuleCamara()
 
 bool ModuleCamara::init()
 {
-	position = Vector3(0.0f, 0.0f, 5.0f);
-	orientation = Quaternion::CreateFromAxisAngle(Vector3::Up, 0.0f);
+	position = Vector3(0.0f, 5.0f, 5.0f);
+	orientation = Quaternion::CreateFromAxisAngle(Vector3::Up, 45.0f);
+	pivotPoint = Vector3::Zero;
 	lookAt = Vector3::Zero;
+
+	yaw = 0.0f;
+	pitch = 0.0f;
+	distanceToPivot = 10.0f;
+
 	nearPlane = 0.1f;
 	farPlane = 2000.0f;
+
+	scrollValue = 0.0f;
+
+	moveSpeed = 1.0f;
 
 
 	Quaternion inverseOrientation;
@@ -43,80 +53,106 @@ void ModuleCamara::update()
 	Vector3 translation = Vector3::Zero;
 	Vector2 rotation = Vector2::Zero;
 
-	float speed = 0.1f;
+	float speed = moveSpeed;
+	float elapsedTime = app->getElapsedMilis()*0.001f;
 
-	if(kbState.IsKeyDown(Keyboard::Keys::LeftShift))
+	float deltaX = 0.0f;
+	float deltaY = 0.0f;
+
+	if (kbState.IsKeyDown(Keyboard::Keys::LeftShift))
 	{
-		speed = 0.2f;
+		speed *= 5.0f;
 	}
 
-	if(mouseState.rightButton)
+	if(mouseState.leftButton)
 	{
+		if (!isDragging)
+		{
+			lastMouseX = mouseState.x;
+			lastMouseY = mouseState.y;
+			isDragging = true;
+		}
+		else
+		{
+			deltaX = (mouseState.x - lastMouseX);
+			deltaY = (mouseState.y - lastMouseY);
+			lastMouseX = mouseState.x;
+			lastMouseY = mouseState.y;
+			yaw -= deltaX * 0.001f;
+			pitch -= deltaY * 0.001f;
+		}
+	}
+	else
+	{
+		isDragging = false;
+	}
+
+	pitch = Clamp(pitch, -1.55f, 1.55f);
+
+	Quaternion quatYaw = Quaternion::CreateFromAxisAngle(Vector3::Up, yaw);
+	Quaternion quatPitch = Quaternion::CreateFromAxisAngle(Vector3::Right, pitch);
+	orientation = quatPitch * quatYaw;
+
+	Vector3 forward = Vector3::Transform(Vector3::Forward, orientation);
+	Vector3 right = Vector3::Transform(Vector3::Right, orientation);
+	Vector3 up = Vector3::Transform(Vector3::Up, orientation);
+
+	if (mouseState.rightButton)
+	{
+
 		if (kbState.IsKeyDown(Keyboard::Keys::W))
 		{
-			translation.z -= 1 * speed;
+			translation += forward * speed * 0.1f;
 		}
 		if (kbState.IsKeyDown(Keyboard::Keys::S))
 		{
-			translation.z += 1 * speed;
+			translation -= forward * speed * 0.1f;
 		}
 		if (kbState.IsKeyDown(Keyboard::Keys::A))
 		{
-			translation.x -= 1 * speed;
+			translation -= right * speed * 0.1f;
 		}
 		if (kbState.IsKeyDown(Keyboard::Keys::D))
 		{
-			translation.x += 1 * speed;
-		}
-		if (kbState.IsKeyDown(Keyboard::Keys::Q))
-		{
-			translation.y += 1 * speed;
+			translation += right * speed * 0.1f;
 		}
 		if (kbState.IsKeyDown(Keyboard::Keys::E))
 		{
-			translation.y -= 1 * speed;
+			translation += up * speed * 0.1f;
+		}
+		if (kbState.IsKeyDown(Keyboard::Keys::Q))
+		{
+			translation -= up * speed * 0.1f;
 		}
 
-		rotation.x = (mouseState.x - dragX) * 0.005f;
-		rotation.y = (mouseState.y - dragY) * 0.005f;
 	}
-
-	if(mouseState.scrollWheelValue > 0)
-	{
-		position += Vector3::Forward * 0.5f;
-	}
-	else if(mouseState.scrollWheelValue < 0)
-	{
-		position += Vector3::Backward * 0.5f;
-	}
-
-	if (kbState.IsKeyDown(Keyboard::Keys::F))
-	{
-		viewMatrix = Matrix::CreateLookAt(position, lookAt, Vector3::Up);
-	}
-
-	//pitch += XMConvertToRadians(rotation.y * 25.f);
-	//yaw += XMConvertToRadians(rotation.x * 25.f);
-
-	//Quaternion pitchQuat = Quaternion::CreateFromAxisAngle(Vector3::Right, pitch);
-	//Quaternion yawQuat = Quaternion::CreateFromAxisAngle(Vector3::Up, yaw);
-
-	//orientation += yawQuat * pitchQuat;
 
 	position += translation;
-	
 
-	viewMatrix.Translation(Vector3::Transform(-position, Matrix::CreateFromQuaternion(orientation)));
+	pivotPoint = position + forward * distanceToPivot;
 
-	dragX = mouseState.x;
-	dragY = mouseState.y;
+	Quaternion inverseOrientation;
+	orientation.Inverse(inverseOrientation);
 
+
+	//viewMatrix = Matrix::CreateFromQuaternion(inverseOrientation);
+	viewMatrix.Translation(Vector3::Transform(-position,inverseOrientation));
+
+
+	viewMatrix = Matrix::CreateLookAt(position, pivotPoint, Vector3::Up);
 	
 }
 
 bool ModuleCamara::cleanUp()
 {
 	return true;
+}
+
+float ModuleCamara::Clamp(float value, float min, float max)
+{
+	if (value < min) return min;
+	if (value > max) return max;
+	return value;
 }
 
 void ModuleCamara::SetFOV(float v_fov)
@@ -134,8 +170,9 @@ void ModuleCamara::SetPlaneDistances(float v_nearPlane, float v_farPlane)
 void ModuleCamara::SetPosition(float x, float y, float z)
 {
 }
-void ModuleCamara::SetLookAt(float x, float y, float z)
+void ModuleCamara::SetLookAt(Vector3 point)
 {
+	lookAt = Vector3(point.x, point.y, point.z);
 }
 
 void ModuleCamara::SetOrientation(float v_pitch, float v_yaw, float v_roll)
