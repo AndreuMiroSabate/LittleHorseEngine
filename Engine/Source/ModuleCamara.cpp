@@ -127,6 +127,19 @@ void ModuleCamara::update()
 
 	}
 
+	if (mouseState.scrollWheelValue > scrollValue)
+	{
+		distanceToPivot -= 1;
+		position = pivotPoint - forward * distanceToPivot;
+		scrollValue = mouseState.scrollWheelValue;
+	}
+	if (mouseState.scrollWheelValue < scrollValue)
+	{
+		distanceToPivot += 1;
+		position = pivotPoint - forward * distanceToPivot;
+		scrollValue = mouseState.scrollWheelValue;
+	}
+
 
 	position += translation;
 
