@@ -45,11 +45,21 @@ void ModuleExercice4::render()
 	ModuleSamplers* samples = app->getSamplers();
 	ModuleShaderDescriptors* shaderDescriptors = app->getShaderDescriptors();
 
+	ImGui::BeginMainMenuBar();
+	if (ImGui::BeginMenu("Info"))
+	{
+		ImGui::Text("Little Horse Engine\n");
+		ImGui::Text("This is a engine made by Andreu Miro \nfor the masters degree of \nadvanced programming of AAA videogames at UPC.");
+		ImGui::EndMenu();
+	}
+	ImGui::EndMainMenuBar();
+
 	ImGui::SetNextWindowSize(ImVec2(300, 200), ImGuiCond_FirstUseEver);
 	ImGui::Begin("Texture Viewer Options");
 	ImGui::Checkbox("Show grid", &showGrid);
 	ImGui::Checkbox("Show axis", &showAxis);
 	ImGui::Combo("Sampler", &samplerIndex, "Linear/Wrap\0Point/Wrap\0Linear/Clamp\0Point/Clamp", 4);
+	ImGui::ShowDemoWindow();
 	ImGui::End();
 
 	ImGui::Begin("FPS");
