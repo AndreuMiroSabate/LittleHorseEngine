@@ -69,12 +69,12 @@ void ModuleCamara::update()
 	if (!blockMouse)
 	{
 		
-			if (kbState.IsKeyDown(Keyboard::Keys::LeftShift))
-			{
-				speed *= 5.0f;
-			}
+		if (kbState.IsKeyDown(Keyboard::Keys::LeftShift))
+		{
+			speed *= 5.0f;
+		}
 
-		if (mouseState.rightButton)
+		if (mouseState.rightButton || mouseState.leftButton)
 		{
 			if (!isDragging)
 			{
@@ -135,6 +135,13 @@ void ModuleCamara::update()
 				translation -= up * speed * dt;
 			}
 
+		}
+
+		if (kbState.IsKeyDown(Keyboard::Keys::LeftAlt))
+		{
+			Vector3 offset = Vector3::Backward * distanceToPivot;
+			offset = Vector3::Transform(offset, orientation);
+			position = pivotPoint + offset;
 		}
 
 		if (mouseState.scrollWheelValue > scrollValue)
