@@ -99,6 +99,16 @@ ComPtr<ID3D12Resource> ModuleResources::createTextureFromFile(const wchar_t* fil
 
 	DirectX::TexMetadata metaData = image.GetMetadata();
 
+	if(metaData.mipLevels == 0)
+	{
+		return nullptr;
+	}
+	if(metaData.mipLevels == 1)
+	{
+		GenerateMipMaps(*image.GetImage(0, 0, 0), DirectX::TEX_FILTER_DEFAULT, 0, image);
+		metaData = image.GetMetadata();
+	}
+
 	D3D12_RESOURCE_DESC descTex = CD3DX12_RESOURCE_DESC::Tex2D(metaData.format, UINT64(metaData.width),
 		UINT(metaData.height), UINT16(metaData.arraySize),
 		UINT16(metaData.mipLevels));

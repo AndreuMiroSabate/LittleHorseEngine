@@ -54,6 +54,10 @@ void ModuleCamara::update()
 	Vector3 translation = Vector3::Zero;
 	Vector2 rotation = Vector2::Zero;
 
+	ImGuiIO& io = ImGui::GetIO();
+
+	bool blockMouse = io.WantCaptureMouse;
+
 	float speed = moveSpeed;
 	//float elapsedTime = app->getElapsedMilis()*0.001f;
 
@@ -62,111 +66,115 @@ void ModuleCamara::update()
 	float deltaX = 0.0f;
 	float deltaY = 0.0f;
 
-	if (kbState.IsKeyDown(Keyboard::Keys::LeftShift))
+	if (!blockMouse)
 	{
-		speed *= 5.0f;
-	}
+		
+			if (kbState.IsKeyDown(Keyboard::Keys::LeftShift))
+			{
+				speed *= 5.0f;
+			}
 
-	if(mouseState.rightButton)
-	{
-		if (!isDragging)
+		if (mouseState.rightButton)
 		{
-			lastMouseX = mouseState.x;
-			lastMouseY = mouseState.y;
-			isDragging = true;
+			if (!isDragging)
+			{
+				lastMouseX = mouseState.x;
+				lastMouseY = mouseState.y;
+				isDragging = true;
+			}
+			else
+			{
+				deltaX = (mouseState.x - lastMouseX);
+				deltaY = (mouseState.y - lastMouseY);
+				lastMouseX = mouseState.x;
+				lastMouseY = mouseState.y;
+				yaw -= deltaX * 0.001f;
+				pitch -= deltaY * 0.001f;
+			}
 		}
 		else
 		{
-			deltaX = (mouseState.x - lastMouseX);
-			deltaY = (mouseState.y - lastMouseY);
-			lastMouseX = mouseState.x;
-			lastMouseY = mouseState.y;
-			yaw -= deltaX * 0.001f;
-			pitch -= deltaY * 0.001f;
-		}
-	}
-	else
-	{
-		isDragging = false;
-	}
-
-	pitch = Clamp(pitch, -1.55f, 1.55f);
-
-	Quaternion quatYaw = Quaternion::CreateFromAxisAngle(Vector3::Up, yaw);
-	Quaternion quatPitch = Quaternion::CreateFromAxisAngle(Vector3::Right, pitch);
-	orientation = quatPitch * quatYaw;
-
-	Vector3 forward = Vector3::Transform(Vector3::Forward, orientation);
-	Vector3 right = Vector3::Transform(Vector3::Right, orientation);
-	Vector3 up = Vector3::Transform(Vector3::Up, orientation);
-
-	if (mouseState.rightButton)
-	{
-
-		if (kbState.IsKeyDown(Keyboard::Keys::W))
-		{
-			translation += forward * speed * dt;
-		}
-		if (kbState.IsKeyDown(Keyboard::Keys::S))
-		{
-			translation -= forward * speed * dt;
-		}
-		if (kbState.IsKeyDown(Keyboard::Keys::A))
-		{
-			translation -= right * speed * dt;
-		}
-		if (kbState.IsKeyDown(Keyboard::Keys::D))
-		{
-			translation += right * speed * dt;
-		}
-		if (kbState.IsKeyDown(Keyboard::Keys::E))
-		{
-			translation += up * speed * dt;
-		}
-		if (kbState.IsKeyDown(Keyboard::Keys::Q))
-		{
-			translation -= up * speed * dt;
+			isDragging = false;
 		}
 
-	}
+		pitch = Clamp(pitch, -1.55f, 1.55f);
 
-	if (mouseState.scrollWheelValue > scrollValue)
-	{
-		if(distanceToPivot > 1)
+		Quaternion quatYaw = Quaternion::CreateFromAxisAngle(Vector3::Up, yaw);
+		Quaternion quatPitch = Quaternion::CreateFromAxisAngle(Vector3::Right, pitch);
+		orientation = quatPitch * quatYaw;
+
+		Vector3 forward = Vector3::Transform(Vector3::Forward, orientation);
+		Vector3 right = Vector3::Transform(Vector3::Right, orientation);
+		Vector3 up = Vector3::Transform(Vector3::Up, orientation);
+
+		if (mouseState.rightButton)
 		{
-			distanceToPivot -= 1.f;
+
+			if (kbState.IsKeyDown(Keyboard::Keys::W))
+			{
+				translation += forward * speed * dt;
+			}
+			if (kbState.IsKeyDown(Keyboard::Keys::S))
+			{
+				translation -= forward * speed * dt;
+			}
+			if (kbState.IsKeyDown(Keyboard::Keys::A))
+			{
+				translation -= right * speed * dt;
+			}
+			if (kbState.IsKeyDown(Keyboard::Keys::D))
+			{
+				translation += right * speed * dt;
+			}
+			if (kbState.IsKeyDown(Keyboard::Keys::E))
+			{
+				translation += up * speed * dt;
+			}
+			if (kbState.IsKeyDown(Keyboard::Keys::Q))
+			{
+				translation -= up * speed * dt;
+			}
+
+		}
+
+		if (mouseState.scrollWheelValue > scrollValue)
+		{
+			if (distanceToPivot > 1)
+			{
+				distanceToPivot -= 1.f;
+				position = pivotPoint - forward * distanceToPivot;
+				
+			}
+		}
+		if (mouseState.scrollWheelValue < scrollValue)
+		{
+			distanceToPivot += 1.f;
 			position = pivotPoint - forward * distanceToPivot;
-			scrollValue = mouseState.scrollWheelValue;
 		}
+
+
+		position += translation;
+
+		pivotPoint = position + forward * distanceToPivot;
+
+		if (kbState.IsKeyDown(Keyboard::Keys::F))
+		{
+			pivotPoint = lookAt;
+			position = pivotPoint - forward * distanceToPivot;
+		}
+
+		Quaternion inverseOrientation;
+		orientation.Inverse(inverseOrientation);
+
+
+		//viewMatrix = Matrix::CreateFromQuaternion(inverseOrientation);
+		viewMatrix.Translation(Vector3::Transform(-position, inverseOrientation));
+
+
+		viewMatrix = Matrix::CreateLookAt(position, pivotPoint, Vector3::Up);
 	}
-	if (mouseState.scrollWheelValue < scrollValue)
-	{
-		distanceToPivot += 1.f;
-		position = pivotPoint - forward * distanceToPivot;
-		scrollValue = mouseState.scrollWheelValue;
-	}
+	scrollValue = mouseState.scrollWheelValue;
 
-
-	position += translation;
-
-	pivotPoint = position + forward * distanceToPivot;
-
-	if (kbState.IsKeyDown(Keyboard::Keys::F))
-	{
-		pivotPoint = lookAt;
-		position = pivotPoint - forward * distanceToPivot;
-	}
-
-	Quaternion inverseOrientation;
-	orientation.Inverse(inverseOrientation);
-
-
-	//viewMatrix = Matrix::CreateFromQuaternion(inverseOrientation);
-	viewMatrix.Translation(Vector3::Transform(-position,inverseOrientation));
-
-
-	viewMatrix = Matrix::CreateLookAt(position, pivotPoint, Vector3::Up);
-	
 }
 
 bool ModuleCamara::cleanUp()

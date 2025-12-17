@@ -36,9 +36,9 @@ void ModuleSamplers::CreateDefaultSamplers(ID3D12Device* device) {
 		// 2. Point Clamp Sampler
 		{
 			D3D12_FILTER_MIN_MAG_MIP_POINT,
-			D3D12_TEXTURE_ADDRESS_MODE_CLAMP,
-			D3D12_TEXTURE_ADDRESS_MODE_CLAMP,
-			D3D12_TEXTURE_ADDRESS_MODE_CLAMP,
+			D3D12_TEXTURE_ADDRESS_MODE_WRAP,
+			D3D12_TEXTURE_ADDRESS_MODE_WRAP,
+			D3D12_TEXTURE_ADDRESS_MODE_WRAP,
 			0.0f,
 			16,
 			D3D12_COMPARISON_FUNC_NONE,
@@ -61,9 +61,9 @@ void ModuleSamplers::CreateDefaultSamplers(ID3D12Device* device) {
 		//4. Point Wrap Sampler
 		{
 			D3D12_FILTER_MIN_MAG_MIP_POINT,
-			D3D12_TEXTURE_ADDRESS_MODE_WRAP,
-			D3D12_TEXTURE_ADDRESS_MODE_WRAP,
-			D3D12_TEXTURE_ADDRESS_MODE_WRAP,
+			D3D12_TEXTURE_ADDRESS_MODE_CLAMP,
+			D3D12_TEXTURE_ADDRESS_MODE_CLAMP,
+			D3D12_TEXTURE_ADDRESS_MODE_CLAMP,
 			0.0f,
 			16,
 			D3D12_COMPARISON_FUNC_NONE,
@@ -72,7 +72,6 @@ void ModuleSamplers::CreateDefaultSamplers(ID3D12Device* device) {
 		}
 	};
 	for (int i = 0; i < std::size(samplers); i++) {
-		device->CreateSampler(&samplers[i], cpuHandle);
-		cpuHandle.ptr += samplerDescriptorSize;
+		device->CreateSampler(&samplers[i], CD3DX12_CPU_DESCRIPTOR_HANDLE(cpuHandle, i, samplerDescriptorSize));
 	}
 }

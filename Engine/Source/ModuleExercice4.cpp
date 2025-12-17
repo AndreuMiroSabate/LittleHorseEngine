@@ -22,7 +22,7 @@ bool ModuleExercice4::init()
 	ModuleShaderDescriptors* shaderDescriptors = app->getShaderDescriptors();
 	
 	dogTexture = resource->createTextureFromFile(L"Assets/Textures/dog.dds");
-	dogTextureDescriptorIndex = shaderDescriptors->allocteDescriptor();
+	dogTextureDescriptorIndex = shaderDescriptors->allocteDescriptor(); //The allocation of a descriptor needs to be revvised and redo, now doesn't work properly
 	shaderDescriptors->createSRV(dogTexture.Get(), 0);  //For this exercise is good, but an scalable version is needed for more textures
 
 	debugDrawPass = std::make_unique<DebugDrawPass>(d3d12->getDevice(), d3d12->getCommandQueue());
@@ -42,14 +42,14 @@ void ModuleExercice4::render()
 	ID3D12GraphicsCommandList* commandList = d3d12->getCommandList();
 
 	ID3D12DescriptorHeap* srvHeap;
-	ModuleSamplers* samplesHeap = app->getSamplers();
+	ModuleSamplers* samples = app->getSamplers();
 	ModuleShaderDescriptors* shaderDescriptors = app->getShaderDescriptors();
 
 	ImGui::SetNextWindowSize(ImVec2(300, 200), ImGuiCond_FirstUseEver);
 	ImGui::Begin("Texture Viewer Options");
 	ImGui::Checkbox("Show grid", &showGrid);
 	ImGui::Checkbox("Show axis", &showAxis);
-	ImGui::ShowDemoWindow();
+	ImGui::Combo("Sampler", &samplerIndex, "Linear/Wrap\0Point/Wrap\0Linear/Clamp\0Point/Clamp", 4);
 	ImGui::End();
 
 	ImGui::Begin("FPS");
@@ -102,12 +102,12 @@ void ModuleExercice4::render()
 	commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	commandList->IASetVertexBuffers(0, 1, &vertexBufferView);
 
-	ID3D12DescriptorHeap* descriptorHeaps[] = { shaderDescriptors->getDescriptorHeap(), samplesHeap->getHeap()};
+	ID3D12DescriptorHeap* descriptorHeaps[] = { shaderDescriptors->getDescriptorHeap(), samples->getHeap()};
 	commandList->SetDescriptorHeaps(2, descriptorHeaps);
 
 	commandList->SetGraphicsRoot32BitConstants(0, sizeof(XMMATRIX) / sizeof(UINT32), &mvp, 0);
 	commandList->SetGraphicsRootDescriptorTable(1, shaderDescriptors->getDescriptorHeap()->GetGPUDescriptorHandleForHeapStart());
-	commandList->SetGraphicsRootDescriptorTable(2, samplesHeap->getHeap()->GetGPUDescriptorHandleForHeapStart());
+	commandList->SetGraphicsRootDescriptorTable(2, samples->GetGPUHandle(samplerIndex));
 
 	commandList->DrawInstanced(6, 1, 0, 0);
 
