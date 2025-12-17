@@ -1,2 +1,11 @@
 # DirectX12Engine
-An engine used to do the exercices for my master degree
+
+Little Horse Engine is an engine created by Andreu Miró for the masters degree: Advanced programming for AAA video games from UPC. This engine uses DirectX12.
+
+## Controls
+Unity Camera Controls:
+ - Right Click + AWSDQE FPS movement
+ - Mouse Wheel to zoom in or out
+ - Left Click + Left Alt to orbit the object
+ - F to center the view to the object
+ - Left shift to increase the speed
