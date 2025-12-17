@@ -59,7 +59,6 @@ void ModuleCamara::update()
 	bool blockMouse = io.WantCaptureMouse;
 
 	float speed = moveSpeed;
-	//float elapsedTime = app->getElapsedMilis()*0.001f;
 
 	float dt = ImGui::GetIO().DeltaTime;
 

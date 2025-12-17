@@ -59,7 +59,7 @@ void ModuleD3D12::preRender()
 }
 void ModuleD3D12::postRender()
 {
-	swapChain->Present(0, 0);
+	swapChain->Present(1, 0);
 	drawFenceValues[currentBackBufferIdx] = ++drawFenceCounter;
 	comandQueue->Signal(drawFence.Get(), drawFenceValues[currentBackBufferIdx]);
 }

@@ -2,9 +2,7 @@
 #include "Application.h"
 #include "ModuleInput.h"
 #include "ModuleD3D12.h"
-#include "ModuleEditor.h"
 #include "ModuleResources.h"
-#include "ModuleExercice3.h"
 #include "ModuleExercice4.h"
 #include "ModuleSamplers.h"
 #include "ModuleShaderDescriptors.h"
@@ -19,9 +17,7 @@ Application::Application(int argc, wchar_t** argv, void* hWnd)
     modules.push_back(samplers = new ModuleSamplers());
 	modules.push_back(shaderDescriptors = new ModuleShaderDescriptors());
     modules.push_back(camara = new ModuleCamara());
-    //modules.push_back(new ModuleExercice3());
     modules.push_back(new ModuleExercice4());
-    //modules.push_back(new ModuleEditor());
 	
 }
 

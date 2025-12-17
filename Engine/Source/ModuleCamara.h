@@ -29,7 +29,6 @@ public:
 	float nearPlane;
 	float farPlane;
 	
-	
 	Vector3 lookAt;
 	float roll;
 	Matrix viewMatrix;
