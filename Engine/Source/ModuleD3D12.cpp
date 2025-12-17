@@ -59,7 +59,7 @@ void ModuleD3D12::preRender()
 }
 void ModuleD3D12::postRender()
 {
-	swapChain->Present(1, 0);
+	swapChain->Present(0, 0);
 	drawFenceValues[currentBackBufferIdx] = ++drawFenceCounter;
 	comandQueue->Signal(drawFence.Get(), drawFenceValues[currentBackBufferIdx]);
 }
@@ -177,7 +177,7 @@ D3D12_CPU_DESCRIPTOR_HANDLE ModuleD3D12::getDepthStencilDescriptor()
 
 void ModuleD3D12::getWindowSize(unsigned& width, unsigned& height)
 {
-	RECT rect;
+	RECT rect = {};
 	GetClientRect(hWnd, &rect);
 	width = rect.right - rect.left;
 	height = rect.bottom - rect.top;
@@ -249,11 +249,13 @@ void ModuleD3D12::resize()
 		DXGI_SWAP_CHAIN_DESC swapChainDesc = {};
 		swapChain->GetDesc(&swapChainDesc);
 		swapChain->ResizeBuffers(FRAMES_IN_FLIGHT, windowWidth, windowHeight, swapChainDesc.BufferDesc.Format, swapChainDesc.Flags);
-		currentBackBufferIdx = swapChain->GetCurrentBackBufferIndex();
-		createRenderTargets();
-		createDepthStencilBuffer();
+		//currentBackBufferIdx = swapChain->GetCurrentBackBufferIndex();
+		if (windowWidth > 0 && windowHeight > 0)
+		{
+			createRenderTargets();
+			createDepthStencilBuffer();
+		}
 	}
-	
 }
 
 void ModuleD3D12::flush()

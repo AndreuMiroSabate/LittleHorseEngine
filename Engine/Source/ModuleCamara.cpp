@@ -1,6 +1,7 @@
 #include "Globals.h"
 #include "ModuleCamara.h"
 #include "Application.h"
+#include "ModuleInput.h"
 
 #include "Mouse.h"
 #include "Keyboard.h"
@@ -45,7 +46,7 @@ bool ModuleCamara::init()
 void ModuleCamara::update()
 {
 	Keyboard& keyboard = Keyboard::Get();
-	Mouse& mouse = Mouse::Get();
+	Mouse& mouse = Mouse::Get(); 
 
 	Keyboard::State kbState = keyboard.GetState();
 	Mouse::State mouseState = mouse.GetState();
@@ -54,7 +55,9 @@ void ModuleCamara::update()
 	Vector2 rotation = Vector2::Zero;
 
 	float speed = moveSpeed;
-	float elapsedTime = app->getElapsedMilis()*0.001f;
+	//float elapsedTime = app->getElapsedMilis()*0.001f;
+
+	float dt = ImGui::GetIO().DeltaTime;
 
 	float deltaX = 0.0f;
 	float deltaY = 0.0f;
@@ -102,27 +105,27 @@ void ModuleCamara::update()
 
 		if (kbState.IsKeyDown(Keyboard::Keys::W))
 		{
-			translation += forward * speed * 0.1f;
+			translation += forward * speed * dt;
 		}
 		if (kbState.IsKeyDown(Keyboard::Keys::S))
 		{
-			translation -= forward * speed * 0.1f;
+			translation -= forward * speed * dt;
 		}
 		if (kbState.IsKeyDown(Keyboard::Keys::A))
 		{
-			translation -= right * speed * 0.1f;
+			translation -= right * speed * dt;
 		}
 		if (kbState.IsKeyDown(Keyboard::Keys::D))
 		{
-			translation += right * speed * 0.1f;
+			translation += right * speed * dt;
 		}
 		if (kbState.IsKeyDown(Keyboard::Keys::E))
 		{
-			translation += up * speed * 0.1f;
+			translation += up * speed * dt;
 		}
 		if (kbState.IsKeyDown(Keyboard::Keys::Q))
 		{
-			translation -= up * speed * 0.1f;
+			translation -= up * speed * dt;
 		}
 
 	}

@@ -49,6 +49,12 @@ void ModuleExercice4::render()
 	ImGui::Begin("Texture Viewer Options");
 	ImGui::Checkbox("Show grid", &showGrid);
 	ImGui::Checkbox("Show axis", &showAxis);
+	ImGui::ShowDemoWindow();
+	ImGui::End();
+
+	ImGui::Begin("FPS");
+	ImGui::Text("FPS: %.2f", app->getFPS());
+	ImGui::Text("dt:%.4f", ImGui::GetIO().DeltaTime);
 	ImGui::End();
 
 	unsigned width, height;
@@ -86,11 +92,12 @@ void ModuleExercice4::render()
 	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = d3d12->getRenderTargetDescriptor();
 	D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = d3d12->getDepthStencilDescriptor();
 
-	commandList->RSSetViewports(1, &viewport);
+	
 	commandList->RSSetScissorRects(1, &scissorRect);
 	commandList->OMSetRenderTargets(1, &rtvHandle, false, &dsvHandle);
 	commandList->ClearRenderTargetView(rtvHandle, clearColor, 0, nullptr);
 	commandList->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
+	commandList->RSSetViewports(1, &viewport);
 	commandList->SetGraphicsRootSignature(rootSignature.Get());
 	commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
 	commandList->IASetVertexBuffers(0, 1, &vertexBufferView);
