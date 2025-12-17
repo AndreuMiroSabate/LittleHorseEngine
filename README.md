@@ -2,6 +2,8 @@
 
 Little Horse Engine is an engine created by Andreu Miró for the masters degree: Advanced programming for AAA video games from UPC. This engine uses DirectX12.
 
+Link to github page: https://github.com/AndreuMiroSabate/LittleHorseEngine
+
 ## Controls
 Unity Camera Controls:
  - Right Click + AWSDQE FPS movement
