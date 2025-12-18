@@ -45,27 +45,7 @@ void ModuleExercice4::render()
 	ModuleSamplers* samples = app->getSamplers();
 	ModuleShaderDescriptors* shaderDescriptors = app->getShaderDescriptors();
 
-	ImGui::BeginMainMenuBar();
-	if (ImGui::BeginMenu("Info"))
-	{
-		ImGui::Text("Little Horse Engine\n");
-		ImGui::Text("This is a engine made by Andreu Miro \nfor the masters degree of \nadvanced programming of AAA videogames at UPC.");
-		ImGui::EndMenu();
-	}
-	ImGui::EndMainMenuBar();
-
-	ImGui::SetNextWindowSize(ImVec2(300, 200), ImGuiCond_FirstUseEver);
-	ImGui::Begin("Texture Viewer Options");
-	ImGui::Checkbox("Show grid", &showGrid);
-	ImGui::Checkbox("Show axis", &showAxis);
-	ImGui::Combo("Sampler", &samplerIndex, "Linear/Wrap\0Point/Wrap\0Linear/Clamp\0Point/Clamp", 4);
-	ImGui::ShowDemoWindow();
-	ImGui::End();
-
-	ImGui::Begin("FPS");
-	ImGui::Text("FPS: %.2f", app->getFPS());
-	ImGui::Text("dt:%.4f", ImGui::GetIO().DeltaTime);
-	ImGui::End();
+	commandsImGui();
 
 	unsigned width, height;
 	d3d12->getWindowSize(width, height);
@@ -243,5 +223,92 @@ Matrix ModuleExercice4::createModelMatrix()
 	Matrix rotation = Matrix::CreateRotationY(time);
 	Matrix scale = Matrix::CreateScale(1.0f, 1.0f, 1.0f);
 	return scale * rotation * translation;
+}
+
+void ModuleExercice4::commandsImGui()
+{
+	ImGui::BeginMainMenuBar();
+	if(ImGui::BeginMenu("Windows"))
+	{
+		if (ImGui::MenuItem("Texture Viewer Options", NULL, textureViewerOptionsOpen))
+		{
+			textureViewerOptionsOpen = !textureViewerOptionsOpen;
+		}
+		if (ImGui::MenuItem("FPS", NULL, fpsWindowOpen))
+		{
+			fpsWindowOpen = !fpsWindowOpen;
+		}
+		if (ImGui::MenuItem("Show Demo Window", NULL, showDemoWindow))
+		{
+			showDemoWindow = !showDemoWindow;
+		}
+		ImGui::EndMenu();
+	}
+	if (ImGui::BeginMenu("About"))
+	{
+		ImGui::Text("Little Horse Engine\n");
+		ImGui::Text("This is a engine made by Andreu Miro \nfor the masters degree of \nadvanced programming of AAA videogames at UPC.");
+		ImGui::Text("MIT License \nCopyright(c) 2025 AndreuMiroSabate\n Permission is hereby granted, free of charge, to any person obtaining a copy\n"
+			"of this software and associated documentation files(the Software), to deal\n"
+			"in the Software without restriction, including without limitation the rights\n"
+			"to use, copy, modify, merge, publish, distribute, sublicense, and /or sell\n"
+			"copies of the Software, and to permit persons to whom the Software is\n"
+			"furnished to do so, subject to the following conditions :\n"
+
+			"The above copyright notice and this permission notice shall be included in all\n"
+			"copies or substantial portions of the Software.\n"
+
+			"THE SOFTWARE IS PROVIDED AS IS, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR\n"
+			"IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,\n"
+			"FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT.IN NO EVENT SHALL THE\n"
+			"AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER\n"
+			"LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,\n"
+			"OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE\n"
+			"SOFTWARE.");
+		ImGui::EndMenu();
+	}
+	ImGui::EndMainMenuBar();
+
+	if(textureViewerOptionsOpen)
+	{
+		ImGui::SetNextWindowSize(ImVec2(300, 200), ImGuiCond_FirstUseEver);
+		ImGui::Begin("Texture Viewer Options");
+		ImGui::Checkbox("Show grid", &showGrid);
+		ImGui::Checkbox("Show axis", &showAxis);
+		ImGui::Combo("Sampler", &samplerIndex, "Linear/Wrap\0Point/Wrap\0Linear/Clamp\0Point/Clamp", 4);
+		ImGui::End();
+	}
+
+	if (fpsWindowOpen)
+	{
+		ImGui::Begin("FPS");
+		ImGui::PlotHistogram("Framerate", [](void* data, int idx) {
+			Application* app = reinterpret_cast<Application*>(data);
+			static const int MAX_FPS_TICKS = 30;
+			static std::array<float, MAX_FPS_TICKS> frameTimes = {};
+			static int currentIndex = 0;
+			frameTimes[currentIndex] = app->getFPS();
+			currentIndex = (currentIndex + 1) % MAX_FPS_TICKS;
+			return frameTimes[idx];
+			}, app, 30, 0, nullptr, 0.0f, 100.0f, ImVec2(0, 80));
+		ImGui::Text("FPS: %.2f", app->getFPS());
+		ImGui::PlotHistogram("Frame Time (ms)", [](void* data, int idx) {
+			Application* app = reinterpret_cast<Application*>(data);
+			static const int MAX_FPS_TICKS = 30;
+			static std::array<float, MAX_FPS_TICKS> frameTimes = {};
+			static int currentIndex = 0;
+			frameTimes[currentIndex] = app->getAvgElapsedMs();
+			currentIndex = (currentIndex + 1) % MAX_FPS_TICKS;
+			return frameTimes[idx];
+			}, app, 30, 0, nullptr, 0.0f, 100.0f, ImVec2(0, 80));
+		ImGui::Text("dt:%.4f", ImGui::GetIO().DeltaTime);
+		ImGui::End();
+	}
+
+	if(showDemoWindow)
+	{
+		ImGui::ShowDemoWindow(&showDemoWindow);
+	}
+
 }
 

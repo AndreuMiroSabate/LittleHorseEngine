@@ -18,6 +18,8 @@ public:
 
     Matrix createModelMatrix();
 
+    void commandsImGui();
+
 private:
 
     ComPtr<ID3D12Resource> vertexBuffer;
@@ -32,6 +34,10 @@ private:
 	bool showGrid = true;
 	bool showAxis = true;
 
+	bool fpsWindowOpen = true;
+	bool textureViewerOptionsOpen = true;
+	bool showDemoWindow = false;
+	bool consoleOpen = true;
 
 	int samplerIndex = 0;
 

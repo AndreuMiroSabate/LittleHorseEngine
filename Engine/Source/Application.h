@@ -25,11 +25,11 @@ public:
     void         update();
     bool         cleanUp();
 
-    ModuleD3D12* getD3D12() { return d3d12; }
-    ModuleResources* getResources() { return resources; }
-    ModuleSamplers* getSamplers() { return samplers; }
-    ModuleShaderDescriptors* getShaderDescriptors() { return shaderDescriptors; }
-	ModuleCamara* getCamara() { return camara; }
+    ModuleD3D12* getD3D12() const { return d3d12; }
+    ModuleResources* getResources() const { return resources; }
+    ModuleSamplers* getSamplers() const { return samplers; }
+    ModuleShaderDescriptors* getShaderDescriptors() const { return shaderDescriptors; }
+	ModuleCamara* getCamara() const { return camara; }
 
     void requestBrowser(const char* url);
 
