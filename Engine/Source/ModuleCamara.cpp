@@ -73,7 +73,25 @@ void ModuleCamara::update()
 			speed *= 5.0f;
 		}
 
-		if (mouseState.rightButton || mouseState.leftButton)
+		if (mouseState.rightButton)
+		{
+			if (!isDragging)
+			{
+				lastMouseX = mouseState.x;
+				lastMouseY = mouseState.y;
+				isDragging = true;
+			}
+			else
+			{
+				deltaX = (mouseState.x - lastMouseX);
+				deltaY = (mouseState.y - lastMouseY);
+				lastMouseX = mouseState.x;
+				lastMouseY = mouseState.y;
+				yaw -= deltaX * 0.001f;
+				pitch -= deltaY * 0.001f;
+			}
+		}
+		else if(mouseState.leftButton && kbState.IsKeyDown(Keyboard::Keys::LeftAlt))
 		{
 			if (!isDragging)
 			{
