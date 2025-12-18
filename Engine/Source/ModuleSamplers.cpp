@@ -7,7 +7,6 @@ bool ModuleSamplers::init() {
 	ModuleD3D12* d3d12 = app->getD3D12();
 	ID3D12Device* device = d3d12->getDevice();
 
-
 	D3D12_DESCRIPTOR_HEAP_DESC heapDesc = {};
 	heapDesc.NumDescriptors = MAX_SAMPLERS;
 	heapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_SAMPLER;
@@ -33,7 +32,7 @@ void ModuleSamplers::CreateDefaultSamplers(ID3D12Device* device) {
 			{ 0, 0, 0, 0 }, 
 			0.0f, D3D12_FLOAT32_MAX 
 		},
-		// 2. Point Clamp Sampler
+		// 2. Point Wrap Sampler
 		{
 			D3D12_FILTER_MIN_MAG_MIP_POINT,
 			D3D12_TEXTURE_ADDRESS_MODE_WRAP,
@@ -58,7 +57,7 @@ void ModuleSamplers::CreateDefaultSamplers(ID3D12Device* device) {
 			0.0f, D3D12_FLOAT32_MAX
 
 		},
-		//4. Point Wrap Sampler
+		//4. Point Clamp Sampler
 		{
 			D3D12_FILTER_MIN_MAG_MIP_POINT,
 			D3D12_TEXTURE_ADDRESS_MODE_CLAMP,

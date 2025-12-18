@@ -154,13 +154,6 @@ void ModuleExercice4::createVertexBuffer()
 
 bool ModuleExercice4::createRootSignature()
 {
-	/*CD3DX12_ROOT_SIGNATURE_DESC rootSignatureDesc = {};
-	CD3DX12_ROOT_PARAMETER rootParameters[3];
-
-	rootParameters[0].InitAsConstants(sizeof(Matrix) / sizeof(UINT32), 0);
-
-	rootSignatureDesc.Init(1, rootParameters, 0, nullptr, D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);*/
-
 	CD3DX12_ROOT_SIGNATURE_DESC rootSignatureDesc;
 	CD3DX12_ROOT_PARAMETER rootParameters[3] = {};
 	CD3DX12_DESCRIPTOR_RANGE tableRange;
@@ -188,8 +181,7 @@ bool ModuleExercice4::createRootSignature()
 
 void ModuleExercice4::createPSO()
 {
-	D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc = {};
-	
+	D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc = {};	
 
 	auto dataVS = DX::ReadData(L"Exercise4VS.cso");
 	auto dataPS = DX::ReadData(L"Exercise4PS.cso");
@@ -213,7 +205,6 @@ void ModuleExercice4::createPSO()
 	psoDesc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
 
 	app->getD3D12()->getDevice()->CreateGraphicsPipelineState(&psoDesc, IID_PPV_ARGS(&pipelineState));
-
 }
 
 Matrix ModuleExercice4::createModelMatrix()
@@ -309,6 +300,5 @@ void ModuleExercice4::commandsImGui()
 	{
 		ImGui::ShowDemoWindow(&showDemoWindow);
 	}
-
 }
 

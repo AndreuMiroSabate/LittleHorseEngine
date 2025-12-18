@@ -67,13 +67,14 @@ void ModuleCamara::update()
 
 	if (!blockMouse)
 	{
-		
+		//Camera speed boost
 		if (kbState.IsKeyDown(Keyboard::Keys::LeftShift))
 		{
 			speed *= 5.0f;
 		}
 
-		if (mouseState.rightButton)
+		//Camera rotation
+		if (mouseState.rightButton) //Rotation for free look
 		{
 			if (!isDragging)
 			{
@@ -91,7 +92,7 @@ void ModuleCamara::update()
 				pitch -= deltaY * 0.001f;
 			}
 		}
-		else if(mouseState.leftButton && kbState.IsKeyDown(Keyboard::Keys::LeftAlt))
+		else if (mouseState.leftButton && kbState.IsKeyDown(Keyboard::Keys::LeftAlt)) //Rotation for orbiting
 		{
 			if (!isDragging)
 			{
@@ -124,7 +125,7 @@ void ModuleCamara::update()
 		Vector3 right = Vector3::Transform(Vector3::Right, orientation);
 		Vector3 up = Vector3::Transform(Vector3::Up, orientation);
 
-		if (mouseState.rightButton)
+		if (mouseState.rightButton) //Free look movement
 		{
 
 			if (kbState.IsKeyDown(Keyboard::Keys::W))
@@ -154,13 +155,14 @@ void ModuleCamara::update()
 
 		}
 
-		if (kbState.IsKeyDown(Keyboard::Keys::LeftAlt))
+		if (kbState.IsKeyDown(Keyboard::Keys::LeftAlt)) //Orbiting movement
 		{
 			Vector3 offset = Vector3::Backward * distanceToPivot;
 			offset = Vector3::Transform(offset, orientation);
-			position = pivotPoint + offset;
+			position = lookAt + offset;
 		}
 
+		//Zooming
 		if (mouseState.scrollWheelValue > scrollValue)
 		{
 			if (distanceToPivot > 1)
@@ -181,7 +183,7 @@ void ModuleCamara::update()
 
 		pivotPoint = position + forward * distanceToPivot;
 
-		if (kbState.IsKeyDown(Keyboard::Keys::F))
+		if (kbState.IsKeyDown(Keyboard::Keys::F)) //Focus on lookAt point
 		{
 			pivotPoint = lookAt;
 			position = pivotPoint - forward * distanceToPivot;

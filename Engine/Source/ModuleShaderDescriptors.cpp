@@ -32,7 +32,6 @@ bool ModuleShaderDescriptors::init()
 	for (uint32_t i = 0; i < descriptorSize; i++)
 		freeHandles.push_back(i);
 
-	//createSRV();
 	return true;
 }
 
