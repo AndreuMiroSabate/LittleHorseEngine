@@ -19,7 +19,7 @@ public:
 	void SetPosition(float x, float y, float z);
 	void SetLookAt(Vector3 point);
 	void SetOrientation(float v_pitch, float v_yaw, float v_roll);
-	Matrix GetViewMatrix() const;
+	const Matrix& GetViewMatrix() const { return viewMatrix; };
 	void GetProjectionMatrix(Matrix* matrix) const;
 
 	private:

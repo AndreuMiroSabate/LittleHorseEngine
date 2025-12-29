@@ -32,13 +32,10 @@ bool ModuleCamara::init()
 
 	moveSpeed = 1.0f;
 
-
 	Quaternion inverseOrientation;
 	orientation.Inverse(inverseOrientation);
 	viewMatrix = Matrix::CreateFromQuaternion(inverseOrientation);
 	viewMatrix.Translation(-position);
-
-	viewMatrix = Matrix::CreateLookAt(position, pivotPoint, Vector3::Up);
 
 	return true;
 }
@@ -155,7 +152,7 @@ void ModuleCamara::update()
 
 		}
 
-		if (kbState.IsKeyDown(Keyboard::Keys::LeftAlt)) //Orbiting movement
+		if (kbState.IsKeyDown(Keyboard::Keys::LeftAlt) && mouseState.leftButton) //Orbiting movement
 		{
 			Vector3 offset = Vector3::Backward * distanceToPivot;
 			offset = Vector3::Transform(offset, orientation);
@@ -193,11 +190,9 @@ void ModuleCamara::update()
 		orientation.Inverse(inverseOrientation);
 
 
-		//viewMatrix = Matrix::CreateFromQuaternion(inverseOrientation);
+		viewMatrix = Matrix::CreateFromQuaternion(inverseOrientation);
 		viewMatrix.Translation(Vector3::Transform(-position, inverseOrientation));
 
-
-		viewMatrix = Matrix::CreateLookAt(position, pivotPoint, Vector3::Up);
 	}
 	scrollValue = mouseState.scrollWheelValue;
 
@@ -237,11 +232,6 @@ void ModuleCamara::SetLookAt(Vector3 point)
 
 void ModuleCamara::SetOrientation(float v_pitch, float v_yaw, float v_roll)
 {
-}
-
-Matrix ModuleCamara::GetViewMatrix() const
-{
-	return viewMatrix;
 }
 
 void ModuleCamara::GetProjectionMatrix(Matrix* matrix) const
