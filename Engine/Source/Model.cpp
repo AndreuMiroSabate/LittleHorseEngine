@@ -1,11 +1,11 @@
+#include "Globals.h"
+#include "Model.h"
+
 #define TINYGLTF_NO_STB_IMAGE_WRITE
 #define TINYGLTF_NO_STB_IMAGE
 #define TINYGLTF_NO_EXTERNAL_IMAGE
 #define TINYGLTF_IMPLEMENTATION
 
-
-#include "Globals.h"
-#include "Model.h"
 #include "tiny_gltf.h"
 
 void Model::LoadModel(const char* fileName)
