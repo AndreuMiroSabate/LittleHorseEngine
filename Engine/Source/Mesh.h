@@ -1,11 +1,6 @@
 #pragma once
 
-namespace tinygltf
-{
-	class Model;
-	struct Mesh;
-	struct Primitive;
-}
+#include "tiny_gltf.h"
 
 class Mesh
 {
