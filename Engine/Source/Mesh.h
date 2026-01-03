@@ -11,6 +11,9 @@ public:
 		Vector2 texCoord0;
 	};
 
+	Mesh();
+	~Mesh();
+
 	void loadMesh(const tinygltf::Model& model, const tinygltf::Mesh& mesh, const tinygltf::Primitive& primitive);
 
 	bool loadAccessorData(uint8_t* data, size_t elemSize, size_t stride, size_t elemCount, const tinygltf::Model& model, int accesorIndex)
@@ -43,12 +46,14 @@ public:
 private:
 	std::string name;
 
-	uint32_t indexEementSize = 0;
+	uint32_t indexElementSize = 0;
 	uint32_t numIndices = 0;
 	uint32_t numVertices = 0;
 	
 	ComPtr<ID3D12Resource> vertexBuffer;
+	D3D12_VERTEX_BUFFER_VIEW vertexBufferView;
 	ComPtr<ID3D12Resource> indexBuffer;
+	D3D12_INDEX_BUFFER_VIEW indexBufferView;
 
 };
 
