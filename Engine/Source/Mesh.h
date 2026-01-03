@@ -42,6 +42,10 @@ public:
 	}
 private:
 	std::string name;
+
+	uint32_t indexEementSize = 0;
+	uint32_t numIndices = 0;
+	uint32_t numVertices = 0;
 	
 	ComPtr<ID3D12Resource> vertexBuffer;
 	ComPtr<ID3D12Resource> indexBuffer;
