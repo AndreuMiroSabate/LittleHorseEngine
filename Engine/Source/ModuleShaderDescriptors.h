@@ -12,6 +12,7 @@ public:
 
     ID3D12DescriptorHeap* getDescriptorHeap() { return heap.Get(); }
     void createSRV(ID3D12Resource *resource, UINT8 slot);
+	UINT createNullTexture2DSRV();
     //void allocateDescriptor();
 
     D3D12_CPU_DESCRIPTOR_HANDLE getCPUHandle(UINT index);
