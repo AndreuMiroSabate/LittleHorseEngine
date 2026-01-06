@@ -53,7 +53,7 @@ void ModuleCamara::update()
 
 	ImGuiIO& io = ImGui::GetIO();
 
-	bool blockMouse = io.WantCaptureMouse;
+	blockMouse = io.WantCaptureMouse;
 
 	float speed = moveSpeed;
 
@@ -234,8 +234,9 @@ void ModuleCamara::SetOrientation(float v_pitch, float v_yaw, float v_roll)
 {
 }
 
-void ModuleCamara::GetProjectionMatrix(Matrix* matrix) const
+Matrix ModuleCamara::GetProjectionMatrix(float aspectRatio)
 {
+	return Matrix::CreatePerspectiveFieldOfView(XM_PIDIV4, aspectRatio, nearPlane, farPlane);
 }
 
 

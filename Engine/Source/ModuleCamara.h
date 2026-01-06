@@ -19,8 +19,9 @@ public:
 	void SetPosition(float x, float y, float z);
 	void SetLookAt(Vector3 point);
 	void SetOrientation(float v_pitch, float v_yaw, float v_roll);
+	void SetBlockMouse(bool block) { blockMouse = block; }
 	const Matrix& GetViewMatrix() const { return viewMatrix; };
-	void GetProjectionMatrix(Matrix* matrix) const;
+	Matrix GetProjectionMatrix(float aspectRatio);
 
 	private:
 	// Camera parameters
@@ -49,6 +50,8 @@ public:
 	int lastMouseX;
 	int lastMouseY;
 	bool isDragging = false;
+
+	bool blockMouse = false;
 
 	float moveSpeed;
 

@@ -206,9 +206,9 @@ void ModuleExercise5::commandsImGui()
 	ImGui::BeginMainMenuBar();
 	if (ImGui::BeginMenu("Windows"))
 	{
-		if (ImGui::MenuItem("Texture Viewer Options", NULL, textureViewerOptionsOpen))
+		if (ImGui::MenuItem("Texture Viewer Options", NULL, geometryViewerOptionsOpen))
 		{
-			textureViewerOptionsOpen = !textureViewerOptionsOpen;
+			geometryViewerOptionsOpen = !geometryViewerOptionsOpen;
 		}
 		if (ImGui::MenuItem("FPS", NULL, fpsWindowOpen))
 		{
@@ -245,15 +245,86 @@ void ModuleExercise5::commandsImGui()
 	}
 	ImGui::EndMainMenuBar();
 
-	if (textureViewerOptionsOpen)
+
+	Matrix modelM = model->getModelMatrix();
+	static ImGuizmo::OPERATION gizmoOperationLocal = ImGuizmo::TRANSLATE;
+
+	if (geometryViewerOptionsOpen)
 	{
 		ImGui::SetNextWindowSize(ImVec2(300, 200), ImGuiCond_FirstUseEver);
-		ImGui::Begin("Texture Viewer Options");
+		ImGui::Begin("Geometry Viewer Options");
 		ImGui::Checkbox("Show grid", &showGrid);
 		ImGui::Checkbox("Show axis", &showAxis);
-		ImGui::Combo("Sampler", &samplerIndex, "Linear/Wrap\0Point/Wrap\0Linear/Clamp\0Point/Clamp", 4);
+		ImGui::Checkbox("Show guizmo", &showGuizmo);
+		
+
+
+		
+		if (ImGui::IsKeyPressed(ImGuiKey_E))
+		{
+			gizmoOperationLocal = ImGuizmo::TRANSLATE;
+		}
+		if (ImGui::IsKeyPressed(ImGuiKey_R))
+		{
+			gizmoOperationLocal = ImGuizmo::ROTATE;
+		}
+		if (ImGui::IsKeyPressed(ImGuiKey_T))
+		{
+			gizmoOperationLocal = ImGuizmo::SCALE;
+		}
+
+		ImGui::RadioButton("Translate", (int*)&gizmoOperationLocal, (int)ImGuizmo::TRANSLATE);
+		ImGui::SameLine();
+		ImGui::RadioButton("Rotate", (int*)&gizmoOperationLocal, ImGuizmo::ROTATE);
+		ImGui::SameLine();
+		ImGui::RadioButton("Scale", (int*)&gizmoOperationLocal, ImGuizmo::SCALE);
+
+		float translation[3], rotation[3], scale[3];
+		ImGuizmo::DecomposeMatrixToComponents((float*)&modelM, translation, rotation, scale);
+		bool transformed = ImGui::DragFloat3("Tranlated", translation, 0.01f);
+		transformed |= ImGui::DragFloat3("Rotation", rotation, 0.01f);
+		transformed |= ImGui::DragFloat3("Scale", scale, 0.01f);
+
+		if (transformed)
+		{
+			ImGuizmo::RecomposeMatrixFromComponents(translation, rotation, scale, (float*)&modelM);
+			model->setModelMatrix(modelM);
+		}
 		ImGui::End();
 	}
+
+	/*if (showGuizmo)
+	{
+		unsigned width = app->getD3D12()->getWidth();
+		unsigned height = app->getD3D12()->getHeight();
+
+		const Matrix& view = app->getCamara()->GetViewMatrix();
+		Matrix projection = app->getCamara()->GetProjectionMatrix(float(width) / float(height));
+
+		ImGuizmo::BeginFrame();
+		ImGuizmo::SetRect(0, 0, float(width), float(height));
+
+		Matrix viewT = view.Transpose();
+		Matrix projT = projection.Transpose();
+		Matrix modelT = modelM.Transpose();
+
+		ImGuizmo::SetOrthographic(false);
+
+		ImGuizmo::Manipulate((float*)&viewT,(float*)&projT,gizmoOperationLocal,ImGuizmo::LOCAL,(float*)&modelT);
+
+		modelM = modelT.Transpose();
+
+		ImGuiIO& io = ImGui::GetIO();
+
+		app->getCamara()->SetBlockMouse(io.WantCaptureMouse || (showGuizmo && ImGuizmo::IsUsing()));
+
+		if (ImGuizmo::IsUsing())
+		{
+			model->setModelMatrix(modelM);
+		}
+	}*/
+
+	
 
 	if (fpsWindowOpen)
 	{

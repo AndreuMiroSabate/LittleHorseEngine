@@ -5,6 +5,7 @@
 #include "DebugDrawPass.h"
 #include "Model.h"
 #include "Mesh.h"
+#include "ImGuizmo.h"
 
 class ModuleExercise5 :
     public Module
@@ -31,11 +32,14 @@ private:
     std::unique_ptr<DebugDrawPass> debugDrawPass;
     std::unique_ptr<ImGuiPass> imGuiPass;
 
+	ImGuizmo::OPERATION gizmoOperation = ImGuizmo::TRANSLATE;
+
     bool showGrid = true;
     bool showAxis = true;
+	bool showGuizmo = true; 
 
     bool fpsWindowOpen = true;
-    bool textureViewerOptionsOpen = true;
+    bool geometryViewerOptionsOpen = true;
     bool showDemoWindow = false;
     bool consoleOpen = true;
 

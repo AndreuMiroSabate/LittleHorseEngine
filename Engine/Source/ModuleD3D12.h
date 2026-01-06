@@ -42,6 +42,9 @@ public:
 
 	void getWindowSize(unsigned& width, unsigned& height);
 
+	float getWidth() const { return float(windowWidth); }
+	float getHeight() const { return float(windowHeight); }
+
 
 private:
 	HWND hWnd = NULL;
