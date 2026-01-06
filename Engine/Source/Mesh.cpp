@@ -73,6 +73,24 @@ void Mesh::loadMesh(const tinygltf::Model& model, const tinygltf::Mesh& mesh, co
 		indexBufferView.Format = indexFormats[indexElementSize >> 1];
 		indexBufferView.SizeInBytes = indexElementSize * numIndices;
 	}
+	materialIndex = primitive.material;
+}
+
+void Mesh::drawIndexes(ID3D12GraphicsCommandList* commandList) const
+{
+	commandList->IASetPrimitiveTopology(D3D11_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
+	commandList->IASetVertexBuffers(0, 1, &vertexBufferView);
+
+	if (indexBuffer)
+	{
+		commandList->IASetIndexBuffer(&indexBufferView);
+		commandList->DrawIndexedInstanced(numIndices, 1, 0, 0, 0);
+	}
+	else
+	{
+		commandList->DrawInstanced(numVertices, 1, 0, 0);
+	}
+	
 }
 
 bool Mesh::loadAccessorData(uint8_t* data, size_t elemSize, size_t stride, size_t elemCount, const tinygltf::Model& model, int accesorIndex)

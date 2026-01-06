@@ -19,9 +19,13 @@ public:
 
 	void loadMesh(const tinygltf::Model& model, const tinygltf::Mesh& mesh, const tinygltf::Primitive& primitive);
 
+	void drawIndexes(ID3D12GraphicsCommandList* commandList) const;
+
 	bool loadAccessorData(uint8_t* data, size_t elemSize, size_t stride, size_t elemCount, const tinygltf::Model& model, int accesorIndex);
 
 	bool loadAccessorDataX(uint8_t* data, size_t elemSize, size_t stride, size_t elemCount, const tinygltf::Model& model, const std::map<std::string, int>& attributes, const char* accesorName);
+
+	int getMaterialIndex() const { return materialIndex; }
 
 private:
 	std::string name;
@@ -29,6 +33,8 @@ private:
 	uint32_t indexElementSize = 0;
 	uint32_t numIndices = 0;
 	uint32_t numVertices = 0;
+
+	int materialIndex = -1;
 	
 	ComPtr<ID3D12Resource> vertexBuffer;
 	D3D12_VERTEX_BUFFER_VIEW vertexBufferView;
