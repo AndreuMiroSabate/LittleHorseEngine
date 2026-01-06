@@ -8,7 +8,7 @@
 
 #include "tiny_gltf.h"
 
-void Model::LoadModel(const char* fileName)
+void Model::LoadModel(const char* fileName, const char* basePath)
 {
 	tinygltf::TinyGLTF gltfContext;
 	tinygltf::Model model;
@@ -19,20 +19,25 @@ void Model::LoadModel(const char* fileName)
 
 	if (loadOk)
 	{
+
+		meshCount = static_cast<uint32_t>(model.meshes.size());
+		meshes = std::make_unique<Mesh[]>(meshCount);
+		int meshIndex = 0;
+
+		materialCount = static_cast<uint32_t>(model.materials.size());
+		materials = std::make_unique<BasicMaterial[]>(materialCount);
+		int materialIndex = 0;
+
 		for (const auto& sMeshes : model.meshes)
 		{
 			for (const auto& primitive : sMeshes.primitives)
 			{
-				Mesh* mesh = new Mesh;
-				mesh->loadMesh(model, sMeshes, primitive);
-				meshes.push_back(mesh);
+				meshes[meshIndex++].loadMesh(model, sMeshes, primitive);
 			}
 		}
 		for (const auto& sMaterial : model.materials)
 		{
-			BasicMaterial* material = new BasicMaterial;
-			material->load(model, sMaterial, fileName);
-			materials.push_back(material);
+			materials[materialIndex++].load(model, sMaterial, basePath);
 		}
 	}
 	else
