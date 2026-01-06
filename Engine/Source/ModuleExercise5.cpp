@@ -21,9 +21,8 @@ bool ModuleExercise5::init()
 	ModuleResources* resource = app->getResources();
 	ModuleShaderDescriptors* shaderDescriptors = app->getShaderDescriptors();
 
-	dogTexture = resource->createTextureFromFile(L"Assets/Textures/dog.dds");
-	dogTextureDescriptorIndex = shaderDescriptors->allocteDescriptor(); //The allocation of a descriptor needs to be revvised and redo, now doesn't work properly
-	shaderDescriptors->createSRV(dogTexture.Get(), 0);  //For this exercise is good, but an scalable version is needed for more textures
+	model = std::make_unique<Model>();
+	model->LoadModel("Assets/Models/Duck/glTF/Duck.gltf");
 
 	debugDrawPass = std::make_unique<DebugDrawPass>(d3d12->getDevice(), d3d12->getCommandQueue());
 	imGuiPass = std::make_unique<ImGuiPass>(d3d12->getDevice(), d3d12->getHwnd());
@@ -184,8 +183,8 @@ void ModuleExercise5::createPSO()
 {
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc = {};
 
-	auto dataVS = DX::ReadData(L"Exercise4VS.cso");
-	auto dataPS = DX::ReadData(L"Exercise4PS.cso");
+	auto dataVS = DX::ReadData(L"Exercise5VS.cso");
+	auto dataPS = DX::ReadData(L"Exercise5PS.cso");
 
 	psoDesc.VS = { dataVS.data(), dataVS.size() };
 	psoDesc.PS = { dataPS.data(), dataPS.size() };

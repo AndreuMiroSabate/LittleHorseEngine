@@ -3,6 +3,7 @@
 #include "ModuleResources.h"
 #include "ImGuiPass.h"
 #include "DebugDrawPass.h"
+#include "Model.h"
 class ModuleExercise5 :
     public Module
 {
@@ -25,8 +26,7 @@ private:
     D3D12_VERTEX_BUFFER_VIEW vertexBufferView;
     ComPtr<ID3D12PipelineState> pipelineState;
     ComPtr<ID3D12RootSignature> rootSignature;
-    ComPtr<ID3D12Resource> dogTexture;
-    UINT dogTextureDescriptorIndex;
+	std::unique_ptr<Model> model;
     std::unique_ptr<DebugDrawPass> debugDrawPass;
     std::unique_ptr<ImGuiPass> imGuiPass;
 
