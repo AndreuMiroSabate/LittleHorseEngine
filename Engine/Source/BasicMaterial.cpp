@@ -3,7 +3,6 @@
 
 #include "Application.h"
 #include "ModuleResources.h"
-#include "ModuleShaderDescriptors.h"
 
 #define TINYGLTF_NO_STB_IMAGE_WRITE
 #define TINYGLTF_NO_STB_IMAGE
@@ -29,21 +28,22 @@ void BasicMaterial::load(const tinygltf::Model& model, const tinygltf::Material&
 		float(material.pbrMetallicRoughness.baseColorFactor[3])
 	);
 
-	if(material.pbrMetallicRoughness.baseColorTexture.index >= 0)
-	{
 		const tinygltf::Texture& texture = model.textures[material.pbrMetallicRoughness.baseColorTexture.index];
 		const tinygltf::Image& image = model.images[texture.source];
+
 		if(!image.uri.empty())
 		{
 			std::string fullPath = std::string(filePath) + image.uri;
 			std::wstring wFullPath(fullPath.begin(), fullPath.end());
-			colorTexture = app->getResources()->createTextureFromFile(wFullPath.c_str());
+			colorTexture = app->getResources()->createTextureFromFile(wFullPath.c_str(), true);
 
 			materialData.baseColor = colour;
 			materialData.hasBaseColorTexture = TRUE;
 
-			shaderDescriptorIndex = app->getShaderDescriptors()->allocteDescriptor();
-			app->getShaderDescriptors()->createSRV(colorTexture.Get(), shaderDescriptorIndex);		
+
+			shaderDescriptors = app->getShaderDescriptors();
+			shaderDescriptorIndex = shaderDescriptors->allocteDescriptor();
+			app->getShaderDescriptors()->createSRV(colorTexture.Get(), 0);		
 			
 		}
 		else
@@ -52,7 +52,6 @@ void BasicMaterial::load(const tinygltf::Model& model, const tinygltf::Material&
 			materialData.baseColor = colour;
 			materialData.hasBaseColorTexture = FALSE;
 		}
-	}
 
 	materialBuffer = app->getResources()->CreateDefaultBuffer(&materialData, sizeof(MaterialData), "Material Buffer");
 }

@@ -86,26 +86,28 @@ ComPtr<ID3D12Resource> ModuleResources::getUploadHeap(size_t size)
 	return buffer;
 }
 
-ComPtr<ID3D12Resource> ModuleResources::createTextureFromFile(const wchar_t* filePath)
+ComPtr<ID3D12Resource> ModuleResources::createTextureFromFile(const wchar_t* filePath, bool defaultSRGB)
 {
 	DirectX::ScratchImage image;
 	if (FAILED(LoadFromDDSFile(filePath, DDS_FLAGS_NONE, nullptr, image)))
 	{
 		if (FAILED(LoadFromTGAFile(filePath, nullptr, image)))
 		{
-			LoadFromWICFile(filePath, WIC_FLAGS_NONE, nullptr, image);
+			if (FAILED(LoadFromWICFile(filePath, defaultSRGB ? DirectX::WIC_FLAGS_DEFAULT_SRGB : DirectX::WIC_FLAGS_NONE, nullptr, image)))
+			{
+				return nullptr;
+			}
 		}
 	}
 
 	DirectX::TexMetadata metaData = image.GetMetadata();
 
-	if(metaData.mipLevels == 0)
+	if (metaData.mipLevels == 1)
 	{
-		return nullptr;
-	}
-	if(metaData.mipLevels == 1)
-	{
-		GenerateMipMaps(*image.GetImage(0, 0, 0), DirectX::TEX_FILTER_DEFAULT, 0, image);
+		DirectX::ScratchImage mipImages;
+
+		GenerateMipMaps(*image.GetImage(0, 0, 0), DirectX::TEX_FILTER_DEFAULT, 0, mipImages);
+		image = std::move(mipImages);
 		metaData = image.GetMetadata();
 	}
 

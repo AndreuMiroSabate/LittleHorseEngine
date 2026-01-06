@@ -21,7 +21,7 @@ bool ModuleExercice4::init()
 	ModuleResources* resource = app->getResources();
 	ModuleShaderDescriptors* shaderDescriptors = app->getShaderDescriptors();
 	
-	dogTexture = resource->createTextureFromFile(L"Assets/Textures/dog.dds");
+	dogTexture = resource->createTextureFromFile(L"Assets/Textures/dog.dds", true);
 	dogTextureDescriptorIndex = shaderDescriptors->allocteDescriptor(); //The allocation of a descriptor needs to be revvised and redo, now doesn't work properly
 	shaderDescriptors->createSRV(dogTexture.Get(), 0);  //For this exercise is good, but an scalable version is needed for more textures
 
