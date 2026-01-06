@@ -3,7 +3,7 @@
 #include "ModuleInput.h"
 #include "ModuleD3D12.h"
 #include "ModuleResources.h"
-#include "ModuleExercice4.h"
+#include "ModuleExercise5.h"
 #include "ModuleSamplers.h"
 #include "ModuleShaderDescriptors.h"
 #include "ModuleCamara.h"
@@ -17,7 +17,7 @@ Application::Application(int argc, wchar_t** argv, void* hWnd)
     modules.push_back(samplers = new ModuleSamplers());
 	modules.push_back(shaderDescriptors = new ModuleShaderDescriptors());
     modules.push_back(camara = new ModuleCamara());
-    modules.push_back(new ModuleExercice4());
+    modules.push_back(new ModuleExercise5());
 	
 }
 

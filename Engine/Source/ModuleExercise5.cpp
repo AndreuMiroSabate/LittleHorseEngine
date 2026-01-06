@@ -14,7 +14,6 @@
 
 bool ModuleExercise5::init()
 {
-	createVertexBuffer();
 	createRootSignature();
 	createPSO();
 	ModuleD3D12* d3d12 = app->getD3D12();
@@ -22,7 +21,8 @@ bool ModuleExercise5::init()
 	ModuleShaderDescriptors* shaderDescriptors = app->getShaderDescriptors();
 
 	model = std::make_unique<Model>();
-	model->LoadModel("Assets/Models/Duck/glTF/Duck.gltf");
+	model->LoadModel("Assets/Models/Duck/glTF/Duck.gltf","Assets/Models/Duck/glTF/");
+	model->setModelMatrix(Matrix::CreateScale(0.01f, 0.01f, 0.01f));
 
 	debugDrawPass = std::make_unique<DebugDrawPass>(d3d12->getDevice(), d3d12->getCommandQueue());
 	imGuiPass = std::make_unique<ImGuiPass>(d3d12->getDevice(), d3d12->getHwnd());
@@ -51,7 +51,7 @@ void ModuleExercise5::render()
 
 	commandList->Reset(d3d12->getCommandAllocator(), pipelineState.Get());
 
-	Matrix model = createModelMatrix();
+	Matrix modelMatrix = model->getModelMatrix();
 
 	Matrix view = app->getCamara()->GetViewMatrix();
 
@@ -62,7 +62,7 @@ void ModuleExercise5::render()
 
 	Matrix projection = Matrix::CreatePerspectiveFieldOfView(fovY, aspectRatio, 0.1f, 100.0f);
 
-	Matrix mvp = (model * view * projection).Transpose();
+	Matrix mvp = (modelMatrix * view * projection).Transpose();
 
 
 	float clearColor[] = { 0.2f, 0.2f, 0.2f, 1.0f };
@@ -95,10 +95,20 @@ void ModuleExercise5::render()
 	commandList->SetDescriptorHeaps(2, descriptorHeaps);
 
 	commandList->SetGraphicsRoot32BitConstants(0, sizeof(XMMATRIX) / sizeof(UINT32), &mvp, 0);
-	commandList->SetGraphicsRootDescriptorTable(1, shaderDescriptors->getDescriptorHeap()->GetGPUDescriptorHandleForHeapStart());
-	commandList->SetGraphicsRootDescriptorTable(2, samples->GetGPUHandle(samplerIndex));
+	commandList->SetGraphicsRootDescriptorTable(3, samples->GetGPUHandle(samplerIndex));
 
-	commandList->DrawInstanced(6, 1, 0, 0);
+	for(const Mesh& mesh : model->GetMeshes())
+	{
+		if (mesh.getMaterialIndex() < model->GetMaterials().size())
+		{
+			const BasicMaterial& material = model->GetMaterials()[mesh.getMaterialIndex()];
+
+			commandList->SetGraphicsRootConstantBufferView(1, material.getMaterialBuffer()->GetGPUVirtualAddress());
+			commandList->SetGraphicsRootDescriptorTable(2, material.getShaderDescriptors()->getGPUHandle(0));
+
+			mesh.drawIndexes(commandList);
+		}
+	}
 
 
 	if (showGrid)
@@ -125,32 +135,6 @@ void ModuleExercise5::render()
 	d3d12->getCommandQueue()->ExecuteCommandLists(UINT(std::size(commandLists)), commandLists);
 }
 
-void ModuleExercise5::createVertexBuffer()
-{
-	struct Vertex
-	{
-		Vector3 position;
-		Vector2 uv;
-	};
-	static Vertex vertices[6] =
-	{
-	 { Vector3(-1.0f, -1.0f, 0.0f), Vector2(-0.2f, 1.2f) },
-	 { Vector3(-1.0f, 1.0f, 0.0f), Vector2(-0.2f, -0.2f) },
-	 { Vector3(1.0f, 1.0f, 0.0f), Vector2(1.2f, -0.2f) },
-	 { Vector3(-1.0f, -1.0f, 0.0f), Vector2(-0.2f, 1.2f) },
-	 { Vector3(1.0f, 1.0f, 0.0f), Vector2(1.2f, -0.2f) },
-	 { Vector3(1.0f, -1.0f, 0.0f), Vector2(1.2f, 1.2f) }
-	};
-
-
-	vertexBuffer = app->getResources()->CreateDefaultBuffer(vertices, sizeof(vertices), "Exercice4");
-
-	vertexBufferView.BufferLocation = vertexBuffer->GetGPUVirtualAddress();
-	vertexBufferView.SizeInBytes = sizeof(vertices);
-	vertexBufferView.StrideInBytes = sizeof(Vertex);
-
-}
-
 bool ModuleExercise5::createRootSignature()
 {
 	CD3DX12_ROOT_SIGNATURE_DESC rootSignatureDesc;
@@ -162,11 +146,11 @@ bool ModuleExercise5::createRootSignature()
 	samplesRange.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SAMPLER, 4, 0);
 
 	rootParameters[0].InitAsConstants((sizeof(Matrix) / sizeof(UINT32)), 0, 0, D3D12_SHADER_VISIBILITY_VERTEX);
-	rootParameters[1].InitAsConstantBufferView(1, 0, D3D12_SHADER_VISIBILITY_VERTEX);
+	rootParameters[1].InitAsConstantBufferView(1, 0, D3D12_SHADER_VISIBILITY_PIXEL);
 	rootParameters[2].InitAsDescriptorTable(1, &tableRange, D3D12_SHADER_VISIBILITY_PIXEL);
 	rootParameters[3].InitAsDescriptorTable(1, &samplesRange, D3D12_SHADER_VISIBILITY_PIXEL);
 
-	rootSignatureDesc.Init(3, rootParameters, 0, nullptr, D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
+	rootSignatureDesc.Init(4, rootParameters, 0, nullptr, D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
 
 	ComPtr<ID3DBlob> blob;
 
@@ -201,6 +185,7 @@ void ModuleExercise5::createPSO()
 	psoDesc.SampleDesc = { 1, 0 };
 	psoDesc.SampleMask = 0xffffffff;
 	psoDesc.RasterizerState = CD3DX12_RASTERIZER_DESC(D3D12_DEFAULT);
+	psoDesc.RasterizerState.FrontCounterClockwise = TRUE;
 	psoDesc.DepthStencilState = CD3DX12_DEPTH_STENCIL_DESC(D3D12_DEFAULT);
 	psoDesc.BlendState = CD3DX12_BLEND_DESC(D3D12_DEFAULT);
 

@@ -4,6 +4,8 @@
 #include "ImGuiPass.h"
 #include "DebugDrawPass.h"
 #include "Model.h"
+#include "Mesh.h"
+
 class ModuleExercise5 :
     public Module
 {
@@ -12,7 +14,6 @@ public:
     void preRender() override;
     void render() override;
 
-    void createVertexBuffer();
     bool createRootSignature();
     void createPSO();
 
