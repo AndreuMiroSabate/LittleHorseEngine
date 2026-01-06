@@ -5,6 +5,12 @@
 #include "ModuleResources.h"
 #include "ModuleShaderDescriptors.h"
 
+#define TINYGLTF_NO_STB_IMAGE_WRITE
+#define TINYGLTF_NO_STB_IMAGE
+#define TINYGLTF_NO_EXTERNAL_IMAGE 
+
+#include "tiny_gltf.h"
+
 #include <string>
 
 BasicMaterial::BasicMaterial()
@@ -36,7 +42,8 @@ void BasicMaterial::load(const tinygltf::Model& model, const tinygltf::Material&
 			materialData.baseColor = colour;
 			materialData.hasBaseColorTexture = TRUE;
 
-			app->getShaderDescriptors()->createSRV(colorTexture.Get(), 0);		
+			shaderDescriptorIndex = app->getShaderDescriptors()->allocteDescriptor();
+			app->getShaderDescriptors()->createSRV(colorTexture.Get(), shaderDescriptorIndex);		
 			
 		}
 		else

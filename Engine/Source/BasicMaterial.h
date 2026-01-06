@@ -1,6 +1,7 @@
 #pragma once
 
-#include "tiny_gltf.h"
+namespace tinygltf { class Model; struct Material; }
+
 class BasicMaterial
 {
 
@@ -19,6 +20,7 @@ private:
 
 	ComPtr<ID3D12Resource> colorTexture;
 	ComPtr<ID3D12Resource> materialBuffer;
+	UINT shaderDescriptorIndex = 0;
 	MaterialData materialData;
 
 };

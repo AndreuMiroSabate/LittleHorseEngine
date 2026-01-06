@@ -19,7 +19,21 @@ void Model::LoadModel(const char* fileName)
 
 	if (loadOk)
 	{
-		//Implementation
+		for (const auto& sMeshes : model.meshes)
+		{
+			for (const auto& primitive : sMeshes.primitives)
+			{
+				Mesh* mesh = new Mesh;
+				mesh->loadMesh(model, sMeshes, primitive);
+				meshes.push_back(mesh);
+			}
+		}
+		for (const auto& sMaterial : model.materials)
+		{
+			BasicMaterial* material = new BasicMaterial;
+			material->load(model, sMaterial, fileName);
+			materials.push_back(material);
+		}
 	}
 	else
 	{
