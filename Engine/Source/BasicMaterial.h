@@ -3,6 +3,12 @@
 #include "tiny_gltf.h"
 class BasicMaterial
 {
+
+	struct MaterialData
+	{
+		Vector4 baseColor;
+		BOOL hasBaseColorTexture;
+	};
 public: 
 	BasicMaterial();
 	~BasicMaterial();
@@ -12,6 +18,8 @@ public:
 private:
 
 	ComPtr<ID3D12Resource> colorTexture;
+	ComPtr<ID3D12Resource> materialBuffer;
+	MaterialData materialData;
 
 };
 

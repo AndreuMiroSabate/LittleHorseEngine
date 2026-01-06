@@ -3,6 +3,7 @@
 
 #include "Application.h"
 #include "ModuleResources.h"
+#include "ModuleShaderDescriptors.h"
 
 #include <string>
 
@@ -31,6 +32,20 @@ void BasicMaterial::load(const tinygltf::Model& model, const tinygltf::Material&
 			std::string fullPath = std::string(filePath) + image.uri;
 			std::wstring wFullPath(fullPath.begin(), fullPath.end());
 			colorTexture = app->getResources()->createTextureFromFile(wFullPath.c_str());
+
+			materialData.baseColor = colour;
+			materialData.hasBaseColorTexture = TRUE;
+
+			app->getShaderDescriptors()->createSRV(colorTexture.Get(), 0);		
+			
+		}
+		else
+		{
+			app->getShaderDescriptors()->createNullTexture2DSRV();
+			materialData.baseColor = colour;
+			materialData.hasBaseColorTexture = FALSE;
 		}
 	}
+
+	materialBuffer = app->getResources()->CreateDefaultBuffer(&materialData, sizeof(MaterialData), "Material Buffer");
 }
