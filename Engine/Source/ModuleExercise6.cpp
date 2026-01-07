@@ -25,6 +25,8 @@ bool ModuleExercise6::init()
 	model->LoadModel("Assets/Models/Duck/glTF/Duck.gltf", "Assets/Models/Duck/glTF/", BasicMaterial::PHONG);
 	model->setModelMatrix(Matrix::CreateScale(0.01f, 0.01f, 0.01f));
 
+	ImGuizmo::SetImGuiContext(ImGui::GetCurrentContext());
+
 	debugDrawPass = std::make_unique<DebugDrawPass>(d3d12->getDevice(), d3d12->getCommandQueue());
 	imGuiPass = std::make_unique<ImGuiPass>(d3d12->getDevice(), d3d12->getHwnd());
 	return true;
@@ -33,6 +35,12 @@ bool ModuleExercise6::init()
 void ModuleExercise6::preRender()
 {
 	imGuiPass->startFrame();
+	ImGuizmo::BeginFrame();
+
+	unsigned width = app->getD3D12()->getWidth();
+	unsigned height = app->getD3D12()->getHeight();
+
+	ImGuizmo::SetRect(0, 0, float(width), float(height));
 }
 
 void ModuleExercise6::render()
@@ -359,7 +367,7 @@ void ModuleExercise6::commandsImGui()
 		ImGui::End();
 	}
 
-	/*if (showGuizmo)
+	if (showGuizmo)
 	{
 		unsigned width = app->getD3D12()->getWidth();
 		unsigned height = app->getD3D12()->getHeight();
@@ -367,18 +375,7 @@ void ModuleExercise6::commandsImGui()
 		const Matrix& view = app->getCamara()->GetViewMatrix();
 		Matrix projection = app->getCamara()->GetProjectionMatrix(float(width) / float(height));
 
-		ImGuizmo::BeginFrame();
-		ImGuizmo::SetRect(0, 0, float(width), float(height));
-
-		Matrix viewT = view.Transpose();
-		Matrix projT = projection.Transpose();
-		Matrix modelT = modelM.Transpose();
-
-		ImGuizmo::SetOrthographic(false);
-
-		ImGuizmo::Manipulate((float*)&viewT,(float*)&projT,gizmoOperationLocal,ImGuizmo::LOCAL,(float*)&modelT);
-
-		modelM = modelT.Transpose();
+		ImGuizmo::Manipulate((float*)&view,(float*)&projection,gizmoOperationLocal,ImGuizmo::LOCAL,(float*)&modelM);
 
 		ImGuiIO& io = ImGui::GetIO();
 
@@ -389,10 +386,6 @@ void ModuleExercise6::commandsImGui()
 			model->setModelMatrix(modelM);
 		}
 	}
-	*/
-
-
-
 
 
 	if (fpsWindowOpen)

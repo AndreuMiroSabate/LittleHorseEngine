@@ -32,6 +32,13 @@ bool ModuleExercise5::init()
 void ModuleExercise5::preRender()
 {
 	imGuiPass->startFrame();
+
+	ImGuizmo::BeginFrame();
+
+	unsigned width = app->getD3D12()->getWidth();
+	unsigned height = app->getD3D12()->getHeight();
+
+	ImGuizmo::SetRect(0, 0, float(width), float(height));
 }
 
 void ModuleExercise5::render()
@@ -293,7 +300,7 @@ void ModuleExercise5::commandsImGui()
 		ImGui::End();
 	}
 
-	/*if (showGuizmo)
+	if (showGuizmo)
 	{
 		unsigned width = app->getD3D12()->getWidth();
 		unsigned height = app->getD3D12()->getHeight();
@@ -301,18 +308,7 @@ void ModuleExercise5::commandsImGui()
 		const Matrix& view = app->getCamara()->GetViewMatrix();
 		Matrix projection = app->getCamara()->GetProjectionMatrix(float(width) / float(height));
 
-		ImGuizmo::BeginFrame();
-		ImGuizmo::SetRect(0, 0, float(width), float(height));
-
-		Matrix viewT = view.Transpose();
-		Matrix projT = projection.Transpose();
-		Matrix modelT = modelM.Transpose();
-
-		ImGuizmo::SetOrthographic(false);
-
-		ImGuizmo::Manipulate((float*)&viewT,(float*)&projT,gizmoOperationLocal,ImGuizmo::LOCAL,(float*)&modelT);
-
-		modelM = modelT.Transpose();
+		ImGuizmo::Manipulate((float*)&view, (float*)&projection, gizmoOperationLocal, ImGuizmo::LOCAL, (float*)&modelM);
 
 		ImGuiIO& io = ImGui::GetIO();
 
@@ -322,9 +318,7 @@ void ModuleExercise5::commandsImGui()
 		{
 			model->setModelMatrix(modelM);
 		}
-	}*/
-
-	
+	}
 
 	if (fpsWindowOpen)
 	{
