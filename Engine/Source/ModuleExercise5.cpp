@@ -21,7 +21,7 @@ bool ModuleExercise5::init()
 	ModuleShaderDescriptors* shaderDescriptors = app->getShaderDescriptors();
 
 	model = std::make_unique<Model>();
-	model->LoadModel("Assets/Models/Duck/glTF/Duck.gltf","Assets/Models/Duck/glTF/");
+	model->LoadModel("Assets/Models/Duck/glTF/Duck.gltf","Assets/Models/Duck/glTF/", BasicMaterial::BASIC);
 	model->setModelMatrix(Matrix::CreateScale(0.01f, 0.01f, 0.01f));
 
 	debugDrawPass = std::make_unique<DebugDrawPass>(d3d12->getDevice(), d3d12->getCommandQueue());
