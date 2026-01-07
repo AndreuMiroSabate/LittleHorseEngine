@@ -31,7 +31,7 @@ public:
     ModuleSamplers* getSamplers() const { return samplers; }
     ModuleShaderDescriptors* getShaderDescriptors() const { return shaderDescriptors; }
 	ModuleCamara* getCamara() const { return camara; }
-    ModuleRingBuffer* getRingBuffer() const { return ringBuffer; }
+    ModuleRingBuffer* getRingBuffer() { return ringBuffer; }
 
     void requestBrowser(const char* url);
 

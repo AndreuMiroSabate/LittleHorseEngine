@@ -19,8 +19,10 @@ BasicMaterial::~BasicMaterial()
 {
 }
 
-void BasicMaterial::load(const tinygltf::Model& model, const tinygltf::Material& material, const char* filePath)
+void BasicMaterial::load(const tinygltf::Model& model, const tinygltf::Material& material, Type materialType, const char* filePath)
 {
+	type = materialType;
+
 	Vector4 colour = Vector4(
 		float(material.pbrMetallicRoughness.baseColorFactor[0]),
 		float(material.pbrMetallicRoughness.baseColorFactor[1]),
@@ -37,8 +39,20 @@ void BasicMaterial::load(const tinygltf::Model& model, const tinygltf::Material&
 			std::wstring wFullPath(fullPath.begin(), fullPath.end());
 			colorTexture = app->getResources()->createTextureFromFile(wFullPath.c_str(), true);
 
-			materialData.baseColor = colour;
-			materialData.hasBaseColorTexture = TRUE;
+			if (materialType == BASIC)
+			{
+				materialData.basic.baseColor = colour;
+				materialData.basic.hasBaseColorTexture = TRUE;
+			}
+			if (materialType == PHONG)
+			{
+				materialData.phong.diffuseColour = colour;
+				materialData.phong.kDifusse = 0.85f;
+				materialData.phong.kSpecular = 0.35f;
+				materialData.phong.kShininess = 32.0f;
+				materialData.phong.hasDiffuseTex = TRUE;
+			}
+			
 
 
 			shaderDescriptors = app->getShaderDescriptors();
@@ -49,9 +63,25 @@ void BasicMaterial::load(const tinygltf::Model& model, const tinygltf::Material&
 		else
 		{
 			app->getShaderDescriptors()->createNullTexture2DSRV();
-			materialData.baseColor = colour;
-			materialData.hasBaseColorTexture = FALSE;
+			if (materialType == BASIC)
+			{
+				materialData.basic.baseColor = colour;
+				materialData.basic.hasBaseColorTexture = TRUE;
+			}
+			if (materialType == PHONG)
+			{
+				materialData.phong.diffuseColour = colour;
+				materialData.phong.kDifusse = 0.85f;
+				materialData.phong.kSpecular = 0.35f;
+				materialData.phong.kShininess = 32.0f;
+				materialData.phong.hasDiffuseTex = TRUE;
+			}
 		}
 
 	materialBuffer = app->getResources()->CreateDefaultBuffer(&materialData, sizeof(MaterialData), "Material Buffer");
+}
+
+void BasicMaterial::setPhongMat(const PhongMaterialData& phong)
+{
+	materialData.phong = phong;
 }
