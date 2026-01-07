@@ -22,6 +22,7 @@ public:
 	void SetBlockMouse(bool block) { blockMouse = block; }
 	const Matrix& GetViewMatrix() const { return viewMatrix; };
 	Matrix GetProjectionMatrix(float aspectRatio);
+	Vector3 GetPos() const { return position; }
 
 	private:
 	// Camera parameters

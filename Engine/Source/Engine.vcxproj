@@ -190,6 +190,7 @@
     <ClInclude Include="ModuleExercice2.h" />
     <ClInclude Include="ModuleExercice4.h" />
     <ClInclude Include="ModuleExercise5.h" />
+    <ClInclude Include="ModuleExercise6.h" />
     <ClInclude Include="ModuleInput.h" />
     <ClInclude Include="ModuleResources.h" />
     <ClInclude Include="ModuleRingBuffer.h" />
@@ -295,6 +296,7 @@
     <ClCompile Include="ModuleExercice2.cpp" />
     <ClCompile Include="ModuleExercice4.cpp" />
     <ClCompile Include="ModuleExercise5.cpp" />
+    <ClCompile Include="ModuleExercise6.cpp" />
     <ClCompile Include="ModuleInput.cpp" />
     <ClCompile Include="ModuleResources.cpp" />
     <ClCompile Include="ModuleRingBuffer.cpp" />
