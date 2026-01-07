@@ -105,24 +105,29 @@ void ModuleExercise6::render()
 	commandList->SetDescriptorHeaps(2, descriptorHeaps);
 
 	commandList->SetGraphicsRoot32BitConstants(0, sizeof(XMMATRIX) / sizeof(UINT32), &mvp, 0);
-	commandList->SetComputeRootConstantBufferView(1, ringBuffer->allocBufferAcess(&perframe));
+	commandList->SetGraphicsRootConstantBufferView(1, ringBuffer->allocBufferAcess(&perframe));
 	commandList->SetGraphicsRootDescriptorTable(4, samples->GetGPUHandle(samplerIndex));
 
+	BEGIN_EVENT(commandList, "Model Render Pass");
 	for (const Mesh& mesh : model->GetMeshes())
 	{
 		if (mesh.getMaterialIndex() < model->GetMaterials().size())
 		{
 			const BasicMaterial& material = model->GetMaterials()[mesh.getMaterialIndex()];
 
-			PerInstance perInstance = { model->getModelMatrix().Transpose(), model->getNormalMatrix().Transpose(), material.getPhong() };
+			PhongMaterialData debugPhong = material.getPhong();
+			debugPhong.diffuseColour = XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f);  // Amarillo
+			debugPhong.hasDiffuseTex = FALSE;  // Desactivar textura temporalmente
+
+			PerInstance perInstance = { model->getModelMatrix().Transpose(), model->getNormalMatrix().Transpose(), debugPhong };
 
 			commandList->SetGraphicsRootConstantBufferView(2, ringBuffer->allocBufferAcess(&perInstance));
-			commandList->SetGraphicsRootDescriptorTable(3, material.getShaderDescriptors()->getGPUHandle(0));
+			commandList->SetGraphicsRootDescriptorTable(3, material.getShaderDescriptors()->getGPUHandle(material.getShaderDescriptorsIndex()));
 
 			mesh.drawIndexes(commandList);
 		}
 	}
-
+	END_EVENT(commandList);
 
 	if (showGrid)
 	{
@@ -164,7 +169,7 @@ bool ModuleExercise6::createRootSignature()
 	rootParameters[3].InitAsDescriptorTable(1, &tableRange, D3D12_SHADER_VISIBILITY_PIXEL);
 	rootParameters[4].InitAsDescriptorTable(1, &samplesRange, D3D12_SHADER_VISIBILITY_PIXEL);
 
-	rootSignatureDesc.Init(4, rootParameters, 0, nullptr, D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
+	rootSignatureDesc.Init(5, rootParameters, 0, nullptr, D3D12_ROOT_SIGNATURE_FLAG_ALLOW_INPUT_ASSEMBLER_INPUT_LAYOUT);
 
 	ComPtr<ID3DBlob> blob;
 
@@ -180,16 +185,17 @@ bool ModuleExercise6::createRootSignature()
 void ModuleExercise6::createPSO()
 {
 	D3D12_GRAPHICS_PIPELINE_STATE_DESC psoDesc = {};
+	D3D12_INPUT_ELEMENT_DESC inputLayout[] = { {"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
+											  {"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
+											  {"NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0} };
 
-	auto dataVS = DX::ReadData(L"Exercise5VS.cso");
-	auto dataPS = DX::ReadData(L"Exercise5PS.cso");
+	auto dataVS = DX::ReadData(L"Exercise6VS.cso");
+	auto dataPS = DX::ReadData(L"Exercise6PS.cso");
 
 	psoDesc.VS = { dataVS.data(), dataVS.size() };
 	psoDesc.PS = { dataPS.data(), dataPS.size() };
 
-	D3D12_INPUT_ELEMENT_DESC inputLayout[] = { {"POSITION", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, 0, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
-											  {"TEXCOORD", 0, DXGI_FORMAT_R32G32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0},
-											  {"NORMAL", 0, DXGI_FORMAT_R32G32B32_FLOAT, 0, D3D12_APPEND_ALIGNED_ELEMENT, D3D12_INPUT_CLASSIFICATION_PER_VERTEX_DATA, 0} };
+	
 
 	psoDesc.InputLayout = { inputLayout, sizeof(inputLayout) / sizeof(D3D12_INPUT_ELEMENT_DESC) };
 	psoDesc.pRootSignature = rootSignature.Get();

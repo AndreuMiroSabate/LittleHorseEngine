@@ -30,10 +30,12 @@ void BasicMaterial::load(const tinygltf::Model& model, const tinygltf::Material&
 		float(material.pbrMetallicRoughness.baseColorFactor[3])
 	);
 
+	if (material.pbrMetallicRoughness.baseColorTexture.index >= 0)
+	{
 		const tinygltf::Texture& texture = model.textures[material.pbrMetallicRoughness.baseColorTexture.index];
 		const tinygltf::Image& image = model.images[texture.source];
 
-		if(!image.uri.empty())
+		if (!image.uri.empty())
 		{
 			std::string fullPath = std::string(filePath) + image.uri;
 			std::wstring wFullPath(fullPath.begin(), fullPath.end());
@@ -52,31 +54,33 @@ void BasicMaterial::load(const tinygltf::Model& model, const tinygltf::Material&
 				materialData.phong.kShininess = 32.0f;
 				materialData.phong.hasDiffuseTex = TRUE;
 			}
-			
+
 
 
 			shaderDescriptors = app->getShaderDescriptors();
 			shaderDescriptorIndex = shaderDescriptors->allocteDescriptor();
-			app->getShaderDescriptors()->createSRV(colorTexture.Get(), 0);		
-			
+			app->getShaderDescriptors()->createSRV(colorTexture.Get(), shaderDescriptorIndex);
+
 		}
-		else
+	}
+	else
+	{
+		app->getShaderDescriptors()->createNullTexture2DSRV();
+		if (materialType == BASIC)
 		{
-			app->getShaderDescriptors()->createNullTexture2DSRV();
-			if (materialType == BASIC)
-			{
-				materialData.basic.baseColor = colour;
-				materialData.basic.hasBaseColorTexture = TRUE;
-			}
-			if (materialType == PHONG)
-			{
-				materialData.phong.diffuseColour = colour;
-				materialData.phong.kDifusse = 0.85f;
-				materialData.phong.kSpecular = 0.35f;
-				materialData.phong.kShininess = 32.0f;
-				materialData.phong.hasDiffuseTex = TRUE;
-			}
+			materialData.basic.baseColor = colour;
+			materialData.basic.hasBaseColorTexture = FALSE;
 		}
+		if (materialType == PHONG)
+		{
+			materialData.phong.diffuseColour = colour;
+			materialData.phong.kDifusse = 0.85f;
+			materialData.phong.kSpecular = 0.35f;
+			materialData.phong.kShininess = 32.0f;
+			materialData.phong.hasDiffuseTex = FALSE;
+		}
+	}
+
 
 	materialBuffer = app->getResources()->CreateDefaultBuffer(&materialData, sizeof(MaterialData), "Material Buffer");
 }

@@ -37,6 +37,24 @@ void Mesh::loadMesh(const tinygltf::Model& model, const tinygltf::Mesh& mesh, co
 		uint8_t* vertexData = (uint8_t*)vertices;
 		loadAccessorData(vertexData + offsetof(Vertex, position), sizeof(Vector3), sizeof(Vertex), numVertices, model, itPos->second);
 		loadAccessorDataX(vertexData + offsetof(Vertex, texCoord0), sizeof(Vector2), sizeof(Vertex), numVertices, model, primitive.attributes, "TEXCOORD_0");
+		loadAccessorDataX(vertexData + offsetof(Vertex, normal), sizeof(Vector3), sizeof(Vertex), numVertices, model, primitive.attributes, "NORMAL");
+		if (!loadAccessorDataX(vertexData + offsetof(Vertex, tangent), sizeof(Vector3), sizeof(Vertex), numVertices, model, primitive.attributes, "TANGENT"))
+		{
+			std::vector<Vector4> tangents;
+			tangents.resize(numVertices);
+
+			if (loadAccessorDataX(reinterpret_cast<uint8_t*>(tangents.data()), sizeof(Vector4), sizeof(Vector4), numVertices, model, primitive.attributes, "TANGENT"))
+			{
+				for (UINT i = 0; i < numVertices; ++i)
+				{
+					Vector3& dst = vertices[i].tangent;
+					const Vector4& src = tangents[i];
+					dst.x = src.x;
+					dst.y = src.y;
+					dst.z = src.z * src.w;
+				}
+			}
+		}
 
 
 		const tinygltf::Accessor& indexAccessor = model.accessors[primitive.indices];

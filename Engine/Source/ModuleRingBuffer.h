@@ -31,7 +31,7 @@ private:
     size_t memoryPerFrame[FRAMES_IN_FLIGHT];
     unsigned currentIndex = 0;
 
-    void** bufferData = nullptr;
+    char* bufferData = nullptr;
 
 };
 

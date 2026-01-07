@@ -40,6 +40,7 @@ public:
 
 	ComPtr<ID3D12Resource> getMaterialBuffer() const { return materialBuffer; }
 	ModuleShaderDescriptors* getShaderDescriptors() const { return shaderDescriptors; }
+	UINT getShaderDescriptorsIndex() const { return shaderDescriptorIndex; }
 	Type getMaterialType() { return type; }
 	const PhongMaterialData& getPhong() const { return materialData.phong; }
 

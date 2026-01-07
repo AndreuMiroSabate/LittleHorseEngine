@@ -31,7 +31,7 @@ bool ModuleRingBuffer::init()
 	fixedBuffer->SetName(L"RingBuffer");
 
 	CD3DX12_RANGE readRange(0, 0);
-	fixedBuffer->Map(0, &readRange, bufferData);
+	fixedBuffer->Map(0, &readRange, reinterpret_cast<void**>(&bufferData));
 
 	currentIndex = d3d12->getBackBufferIndex();
 
@@ -49,8 +49,12 @@ void ModuleRingBuffer::preRender()
 
 	unsigned currentIndex = d3d12->getBackBufferIndex();
 
+
+	if (totalSize == 0)
+		return;
+
+
 	tail = (tail + memoryPerFrame[currentIndex]) % totalSize;
-	totalSize -= memoryPerFrame[currentIndex];
 
 	memoryPerFrame[currentIndex] = 0;
 }
@@ -58,6 +62,13 @@ void ModuleRingBuffer::preRender()
 D3D12_GPU_VIRTUAL_ADDRESS ModuleRingBuffer::allocBuffer(size_t size, const void* data)
 {
 	size = alignUp(size, D3D12_CONSTANT_BUFFER_DATA_PLACEMENT_ALIGNMENT);
+
+
+	if (!fixedBuffer || !bufferData || totalSize == 0 || data == nullptr)
+		return 0;
+
+	ModuleD3D12* d3d12 = app->getD3D12();
+	unsigned frameIndex = d3d12->getBackBufferIndex();
 
 	D3D12_GPU_VIRTUAL_ADDRESS adress = 0;;
 
@@ -70,6 +81,7 @@ D3D12_GPU_VIRTUAL_ADDRESS ModuleRingBuffer::allocBuffer(size_t size, const void*
 			memcpy(bufferData + head, data, size);
 			adress = fixedBuffer->GetGPUVirtualAddress() + head;
 			head += size;
+			memoryPerFrame[frameIndex] += size;
 			return adress;
 			
 		}
@@ -85,6 +97,7 @@ D3D12_GPU_VIRTUAL_ADDRESS ModuleRingBuffer::allocBuffer(size_t size, const void*
 			memcpy(bufferData + head, data, size);
 			adress = fixedBuffer->GetGPUVirtualAddress() + head;
 			head += size;
+			memoryPerFrame[frameIndex] += size;
 			return adress;
 		}
 		else
@@ -97,6 +110,7 @@ D3D12_GPU_VIRTUAL_ADDRESS ModuleRingBuffer::allocBuffer(size_t size, const void*
 			memcpy(bufferData + head, data, size);
 			adress = fixedBuffer->GetGPUVirtualAddress() + head;
 			head += size;
+			memoryPerFrame[frameIndex] += size;
 			return adress;
 		}
 		return 0;
@@ -109,6 +123,7 @@ D3D12_GPU_VIRTUAL_ADDRESS ModuleRingBuffer::allocBuffer(size_t size, const void*
 			memcpy(bufferData, data, size);
 			adress = fixedBuffer->GetGPUVirtualAddress();
 			head = size;
+			memoryPerFrame[frameIndex] += size;
 			return adress;
 		}
 		return 0;
