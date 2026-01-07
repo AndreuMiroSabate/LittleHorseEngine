@@ -115,11 +115,7 @@ void ModuleExercise6::render()
 		{
 			const BasicMaterial& material = model->GetMaterials()[mesh.getMaterialIndex()];
 
-			PhongMaterialData debugPhong = material.getPhong();
-			debugPhong.diffuseColour = XMFLOAT4(1.0f, 1.0f, 0.0f, 1.0f);  // Amarillo
-			debugPhong.hasDiffuseTex = FALSE;  // Desactivar textura temporalmente
-
-			PerInstance perInstance = { model->getModelMatrix().Transpose(), model->getNormalMatrix().Transpose(), debugPhong };
+			PerInstance perInstance = { modelMatrix, model->getNormalMatrix().Transpose(), material.getPhong()};
 
 			commandList->SetGraphicsRootConstantBufferView(2, ringBuffer->allocBufferAcess(&perInstance));
 			commandList->SetGraphicsRootDescriptorTable(3, material.getShaderDescriptors()->getGPUHandle(material.getShaderDescriptorsIndex()));
@@ -160,7 +156,7 @@ bool ModuleExercise6::createRootSignature()
 	CD3DX12_DESCRIPTOR_RANGE tableRange;
 	CD3DX12_DESCRIPTOR_RANGE samplesRange;
 
-	tableRange.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0);
+	tableRange.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SRV, 1, 0, 0);
 	samplesRange.Init(D3D12_DESCRIPTOR_RANGE_TYPE_SAMPLER, 4, 0);
 
 	rootParameters[0].InitAsConstants((sizeof(Matrix) / sizeof(UINT32)), 0, 0, D3D12_SHADER_VISIBILITY_VERTEX);

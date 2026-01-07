@@ -11,7 +11,7 @@ public:
     //void preRender() override;
 
     ID3D12DescriptorHeap* getDescriptorHeap() { return heap.Get(); }
-    void createSRV(ID3D12Resource *resource, UINT8 slot);
+    void createSRV(ID3D12Resource *resource, UINT slot);
 	UINT createNullTexture2DSRV();
     //void allocateDescriptor();
 

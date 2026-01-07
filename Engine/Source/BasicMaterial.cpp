@@ -41,6 +41,7 @@ void BasicMaterial::load(const tinygltf::Model& model, const tinygltf::Material&
 			std::wstring wFullPath(fullPath.begin(), fullPath.end());
 			colorTexture = app->getResources()->createTextureFromFile(wFullPath.c_str(), true);
 
+
 			if (materialType == BASIC)
 			{
 				materialData.basic.baseColor = colour;
@@ -60,6 +61,7 @@ void BasicMaterial::load(const tinygltf::Model& model, const tinygltf::Material&
 			shaderDescriptors = app->getShaderDescriptors();
 			shaderDescriptorIndex = shaderDescriptors->allocteDescriptor();
 			app->getShaderDescriptors()->createSRV(colorTexture.Get(), shaderDescriptorIndex);
+
 
 		}
 	}
