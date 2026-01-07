@@ -318,7 +318,7 @@ void ModuleExercise6::commandsImGui()
 		}
 		ImGui::ColorEdit3("Light Colour", reinterpret_cast<float*>(&light.Lc), ImGuiColorEditFlags_NoAlpha);
 		ImGui::ColorEdit3("Ambient Colour", reinterpret_cast<float*>(&light.Ac), ImGuiColorEditFlags_NoAlpha);
-		for (BasicMaterial material : model->GetMaterials())
+		for (BasicMaterial& material : model->GetMaterials())
 		{
 			if (material.getMaterialType() == BasicMaterial::PHONG)
 			{

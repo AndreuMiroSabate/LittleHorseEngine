@@ -26,7 +26,7 @@ public:
 	}
 
 	std::span<const Mesh> GetMeshes() const { return std::span<const Mesh>(meshes.get(), meshCount); }
-	std::span<const BasicMaterial> GetMaterials() const { return std::span<const BasicMaterial>(materials.get(), materialCount); }
+	std::span<BasicMaterial> GetMaterials() const { return std::span<BasicMaterial>(materials.get(), materialCount); }
 
 private:
 
