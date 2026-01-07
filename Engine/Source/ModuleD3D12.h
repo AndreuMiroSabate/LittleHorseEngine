@@ -39,6 +39,7 @@ public:
 	ID3D12CommandQueue* getCommandQueue() { return comandQueue.Get(); }
 	ID3D12CommandAllocator* getCommandAllocator() { return commandAllocator[currentBackBufferIdx].Get(); }
 	ID3D12Resource* getBackBuffers() { return backBuffers[currentBackBufferIdx].Get(); }
+	unsigned getBackBufferIndex() const { return currentBackBufferIdx; }
 
 	void getWindowSize(unsigned& width, unsigned& height);
 

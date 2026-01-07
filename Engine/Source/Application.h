@@ -12,6 +12,7 @@ class ModuleResources;
 class ModuleSamplers;
 class ModuleShaderDescriptors;
 class ModuleCamara;
+class ModuleRingBuffer;
 
 class Application
 {
@@ -30,6 +31,7 @@ public:
     ModuleSamplers* getSamplers() const { return samplers; }
     ModuleShaderDescriptors* getShaderDescriptors() const { return shaderDescriptors; }
 	ModuleCamara* getCamara() const { return camara; }
+    ModuleRingBuffer* getRingBuffer() const { return ringBuffer; }
 
     void requestBrowser(const char* url);
 
@@ -52,6 +54,7 @@ private:
     ModuleSamplers* samplers = nullptr;
 	ModuleShaderDescriptors* shaderDescriptors = nullptr;
 	ModuleCamara* camara = nullptr;
+    ModuleRingBuffer* ringBuffer = nullptr;
 
     uint64_t  lastMilis = 0;
     TickList  tickList;

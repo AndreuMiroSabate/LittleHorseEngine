@@ -9,11 +9,18 @@ public:
     ~ModuleRingBuffer();
 
     bool init() override;
+    void preRender() override;
+
+    D3D12_GPU_VIRTUAL_ADDRESS allocBuffer(size_t size, const void* data);
 
 private:
 
     ComPtr<ID3D12Resource> fixedBuffer;
-    size_t size = 0;
+    size_t totalSize = 0;
+    size_t tail = 0;
+    size_t head = 0;
+    size_t memoryPerFrame[FRAMES_IN_FLIGHT];
+    unsigned currentIndex = 0;
 
     void** bufferData = nullptr;
 
