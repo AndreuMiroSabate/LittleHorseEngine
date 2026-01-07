@@ -19,7 +19,6 @@ public:
 	Matrix getNormalMatrix()
 	{
 		Matrix normal = mMatrix;
-		mMatrix.Translation(Vector3::Zero);
 		normal.Invert();
 		normal.Transpose();
 		return normal;

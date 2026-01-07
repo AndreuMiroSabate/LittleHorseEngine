@@ -115,7 +115,7 @@ void ModuleExercise6::render()
 		{
 			const BasicMaterial& material = model->GetMaterials()[mesh.getMaterialIndex()];
 
-			PerInstance perInstance = { modelMatrix, model->getNormalMatrix().Transpose(), material.getPhong()};
+			PerInstance perInstance = { model->getModelMatrix().Transpose(), model->getNormalMatrix().Transpose(), material.getPhong()};
 
 			commandList->SetGraphicsRootConstantBufferView(2, ringBuffer->allocBufferAcess(&perInstance));
 			commandList->SetGraphicsRootDescriptorTable(3, material.getShaderDescriptors()->getGPUHandle(material.getShaderDescriptorsIndex()));
@@ -299,7 +299,7 @@ void ModuleExercise6::commandsImGui()
 		float translation[3], rotation[3], scale[3];
 		ImGuizmo::DecomposeMatrixToComponents((float*)&modelM, translation, rotation, scale);
 		bool transformed = ImGui::DragFloat3("Tranlated", translation, 0.01f);
-		transformed |= ImGui::DragFloat3("Rotation", rotation, 0.01f);
+		transformed |= ImGui::DragFloat3("Rotation", rotation, 0.1f);
 		transformed |= ImGui::DragFloat3("Scale", scale, 0.01f);
 
 		if (transformed)
