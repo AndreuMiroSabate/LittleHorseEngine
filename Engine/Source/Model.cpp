@@ -8,7 +8,7 @@
 
 #include "tiny_gltf.h"
 
-void Model::LoadModel(const char* fileName, const char* basePath)
+void Model::LoadModel(const char* fileName, const char* basePath, BasicMaterial::Type materialType)
 {
 	tinygltf::TinyGLTF gltfContext;
 	tinygltf::Model model;
@@ -37,7 +37,7 @@ void Model::LoadModel(const char* fileName, const char* basePath)
 		}
 		for (const auto& sMaterial : model.materials)
 		{
-			materials[materialIndex++].load(model, sMaterial, basePath);
+			materials[materialIndex++].load(model, sMaterial, materialType, basePath);
 		}
 	}
 	else

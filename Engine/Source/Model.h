@@ -13,9 +13,17 @@ public:
 	//std::vector<Animation> animations;
 	std::unique_ptr<BasicMaterial[]> materials;
 
-	void LoadModel(const char* fileName, const char* basePath);
+	void LoadModel(const char* fileName, const char* basePath, BasicMaterial::Type materialType);
 	void setModelMatrix(const Matrix& matrix) { mMatrix = matrix; }
 	Matrix& getModelMatrix() { return mMatrix; }
+	Matrix getNormalMatrix()
+	{
+		Matrix normal = mMatrix;
+		mMatrix.Translation(Vector3::Zero);
+		normal.Invert();
+		normal.Transpose();
+		return normal;
+	}
 
 	std::span<const Mesh> GetMeshes() const { return std::span<const Mesh>(meshes.get(), meshCount); }
 	std::span<const BasicMaterial> GetMaterials() const { return std::span<const BasicMaterial>(materials.get(), materialCount); }
