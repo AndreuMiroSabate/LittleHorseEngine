@@ -55,6 +55,14 @@ void BasicMaterial::load(const tinygltf::Model& model, const tinygltf::Material&
 				materialData.phong.kShininess = 32.0f;
 				materialData.phong.hasDiffuseTex = TRUE;
 			}
+			if(materialType == PBR_PHONG)
+			{
+				materialData.phong.diffuseColour = colour;
+				materialData.phong.kDifusse = 0.85f;
+				materialData.phong.kSpecular = 0.35f;
+				materialData.phong.kShininess = 32.0f;
+				materialData.phong.hasDiffuseTex = TRUE;
+			}
 
 
 
@@ -81,6 +89,14 @@ void BasicMaterial::load(const tinygltf::Model& model, const tinygltf::Material&
 			materialData.phong.kShininess = 32.0f;
 			materialData.phong.hasDiffuseTex = FALSE;
 		}
+		if (materialType == PBR_PHONG)
+		{
+			materialData.phong.diffuseColour = colour;
+			materialData.phong.kDifusse = 0.85f;
+			materialData.phong.kSpecular = 0.35f;
+			materialData.phong.kShininess = 32.0f;
+			materialData.phong.hasDiffuseTex = TRUE;
+		}
 	}
 
 
@@ -90,4 +106,9 @@ void BasicMaterial::load(const tinygltf::Model& model, const tinygltf::Material&
 void BasicMaterial::setPhongMat(const PhongMaterialData& phong)
 {
 	materialData.phong = phong;
+}
+
+void BasicMaterial::setPBRPhongMat(const PBRPhongMaterialData& pbrPhong)
+{
+	materialData.pbrPhong = pbrPhong;
 }
