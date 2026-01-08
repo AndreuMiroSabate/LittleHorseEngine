@@ -328,37 +328,37 @@ void ModuleExercise7::commandsImGui()
 		ImGui::ColorEdit3("Ambient Colour", reinterpret_cast<float*>(&light.Ac), ImGuiColorEditFlags_NoAlpha);
 		for (BasicMaterial& material : model->GetMaterials())
 		{
-			if (material.getMaterialType() == BasicMaterial::PHONG)
+			if (material.getMaterialType() == BasicMaterial::PBR_PHONG)
 			{
 
 				if (ImGui::CollapsingHeader("Mat", ImGuiTreeNodeFlags_DefaultOpen))
 				{
-					PhongMaterialData phong = material.getPhong();
-					if (ImGui::ColorEdit3("Diffuse Colour", reinterpret_cast<float*>(&phong.diffuseColour)))
+					PBRPhongMaterialData pbrPhong = material.getPBRPhong();
+					if (ImGui::ColorEdit3("Diffuse Colour", reinterpret_cast<float*>(&pbrPhong.diffuseColour)))
 					{
-						material.setPhongMat(phong);
+						material.setPBRPhongMat(pbrPhong);
 					}
 
-					bool hasTexture = phong.hasDiffuseTex;
+					bool hasTexture = pbrPhong.hasDiffuseTex;
 					if (ImGui::Checkbox("Use Texture", &hasTexture))
 					{
-						phong.hasDiffuseTex = hasTexture;
-						material.setPhongMat(phong);
+						pbrPhong.hasDiffuseTex = hasTexture;
+						material.setPBRPhongMat(pbrPhong);
 					}
 
-					if (ImGui::DragFloat("Kd", &phong.kDifusse, 0.01f))
+					if (ImGui::DragFloat("Kd", &pbrPhong.kDifusse, 0.01f))
 					{
-						material.setPhongMat(phong);
+						material.setPBRPhongMat(pbrPhong);
 					}
 
-					if (ImGui::DragFloat("Ks", &phong.kSpecular, 0.01f))
+					if (ImGui::DragFloat("Ks", &pbrPhong.kSpecular, 0.01f))
 					{
-						material.setPhongMat(phong);
+						material.setPBRPhongMat(pbrPhong);
 					}
 
-					if (ImGui::DragFloat("shininess", &phong.kShininess))
+					if (ImGui::DragFloat("shininess", &pbrPhong.kShininess))
 					{
-						material.setPhongMat(phong);
+						material.setPBRPhongMat(pbrPhong);
 					}
 				}
 			}
