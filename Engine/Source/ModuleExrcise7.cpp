@@ -123,7 +123,7 @@ void ModuleExercise7::render()
 		{
 			const BasicMaterial& material = model->GetMaterials()[mesh.getMaterialIndex()];
 
-			PerInstance perInstance = { model->getModelMatrix().Transpose(), model->getNormalMatrix().Transpose(), material.getPhong() };
+			PerInstance perInstance = { model->getModelMatrix().Transpose(), model->getNormalMatrix().Transpose(), material.getPBRPhong() };
 
 			commandList->SetGraphicsRootConstantBufferView(2, ringBuffer->allocBufferAcess(&perInstance));
 			commandList->SetGraphicsRootDescriptorTable(3, material.getShaderDescriptors()->getGPUHandle(material.getShaderDescriptorsIndex()));
@@ -346,12 +346,7 @@ void ModuleExercise7::commandsImGui()
 						material.setPBRPhongMat(pbrPhong);
 					}
 
-					if (ImGui::DragFloat("Kd", &pbrPhong.kDifusse, 0.01f))
-					{
-						material.setPBRPhongMat(pbrPhong);
-					}
-
-					if (ImGui::DragFloat("Ks", &pbrPhong.kSpecular, 0.01f))
+					if (ImGui::ColorEdit3("Specular", reinterpret_cast<float*>(&pbrPhong.kSpecular), 0.01f))
 					{
 						material.setPBRPhongMat(pbrPhong);
 					}

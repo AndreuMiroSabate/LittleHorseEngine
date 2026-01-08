@@ -17,7 +17,7 @@ class ModuleExercise7 :
         Matrix modelMat;
         Matrix normalMat;
 
-        PhongMaterialData material;
+        PBRPhongMaterialData material;
     };
 
     struct PerFrame

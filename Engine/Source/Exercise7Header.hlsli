@@ -13,9 +13,8 @@ cbuffer PerInstance : register(b2)
     float4x4 modelMat;
     float4x4 normalMat;
     
-    float4 diffuseColour;
-    float kDifuse;
+    float3 diffuseColour;
     float3 kSpecular;
     float kShininess;
-    bool hasDifusseTex;
+    bool hasDiffuseTex;
 }
