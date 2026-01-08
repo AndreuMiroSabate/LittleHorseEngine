@@ -57,11 +57,10 @@ void BasicMaterial::load(const tinygltf::Model& model, const tinygltf::Material&
 			}
 			if(materialType == PBR_PHONG)
 			{
-				materialData.phong.diffuseColour = colour;
-				materialData.phong.kDifusse = 0.85f;
-				materialData.phong.kSpecular = 0.35f;
-				materialData.phong.kShininess = 32.0f;
-				materialData.phong.hasDiffuseTex = TRUE;
+				materialData.pbrPhong.diffuseColour = XMFLOAT3(colour.x, colour.y, colour.z);
+				materialData.pbrPhong.kSpecular = XMFLOAT3(0.35f, 0.35f, 0.35f);
+				materialData.pbrPhong.kShininess = 32.0f;
+				materialData.pbrPhong.hasDiffuseTex = TRUE;
 			}
 
 
@@ -91,11 +90,10 @@ void BasicMaterial::load(const tinygltf::Model& model, const tinygltf::Material&
 		}
 		if (materialType == PBR_PHONG)
 		{
-			materialData.phong.diffuseColour = colour;
-			materialData.phong.kDifusse = 0.85f;
-			materialData.phong.kSpecular = 0.35f;
-			materialData.phong.kShininess = 32.0f;
-			materialData.phong.hasDiffuseTex = TRUE;
+			materialData.pbrPhong.diffuseColour = XMFLOAT3(colour.x, colour.y, colour.z);
+			materialData.pbrPhong.kSpecular = XMFLOAT3(0.35f, 0.35f, 0.35f);
+			materialData.pbrPhong.kShininess = 32.0f;
+			materialData.pbrPhong.hasDiffuseTex = FALSE;
 		}
 	}
 

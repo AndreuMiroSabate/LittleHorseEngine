@@ -20,9 +20,8 @@ struct PhongMaterialData
 
 struct PBRPhongMaterialData
 {
-	XMFLOAT4 diffuseColour;
-	float kDifusse;
-	float kSpecular;
+	XMFLOAT3 diffuseColour;
+	XMFLOAT3 kSpecular;
 	float kShininess;
 	BOOL hasDiffuseTex;
 };
