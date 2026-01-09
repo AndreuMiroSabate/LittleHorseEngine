@@ -193,6 +193,7 @@
     <ClInclude Include="ModuleExercise6.h" />
     <ClInclude Include="ModuleExrcise7.h" />
     <ClInclude Include="ModuleInput.h" />
+    <ClInclude Include="ModuleRenderTarget.h" />
     <ClInclude Include="ModuleResources.h" />
     <ClInclude Include="ModuleRingBuffer.h" />
     <ClInclude Include="ModuleSamplers.h" />
@@ -300,6 +301,7 @@
     <ClCompile Include="ModuleExercise6.cpp" />
     <ClCompile Include="ModuleExrcise7.cpp" />
     <ClCompile Include="ModuleInput.cpp" />
+    <ClCompile Include="ModuleRenderTarget.cpp" />
     <ClCompile Include="ModuleResources.cpp" />
     <ClCompile Include="ModuleRingBuffer.cpp" />
     <ClCompile Include="ModuleSamplers.cpp" />
