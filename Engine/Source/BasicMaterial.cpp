@@ -58,8 +58,8 @@ void BasicMaterial::load(const tinygltf::Model& model, const tinygltf::Material&
 			if(materialType == PBR_PHONG)
 			{
 				materialData.pbrPhong.diffuseColour = XMFLOAT3(colour.x, colour.y, colour.z);
-				materialData.pbrPhong.kSpecular = XMFLOAT3(0.35f, 0.35f, 0.35f);
-				materialData.pbrPhong.kShininess = 32.0f;
+				materialData.pbrPhong.kSpecular = XMFLOAT3(0.04f, 0.04f, 0.04f);
+				materialData.pbrPhong.kShininess = 64.0f;
 				materialData.pbrPhong.hasDiffuseTex = TRUE;
 			}
 
@@ -71,31 +71,32 @@ void BasicMaterial::load(const tinygltf::Model& model, const tinygltf::Material&
 
 
 		}
+		else
+		{
+			app->getShaderDescriptors()->createNullTexture2DSRV();
+			if (materialType == BASIC)
+			{
+				materialData.basic.baseColor = colour;
+				materialData.basic.hasBaseColorTexture = FALSE;
+			}
+			if (materialType == PHONG)
+			{
+				materialData.phong.diffuseColour = colour;
+				materialData.phong.kDifusse = 0.85f;
+				materialData.phong.kSpecular = 0.35f;
+				materialData.phong.kShininess = 32.0f;
+				materialData.phong.hasDiffuseTex = FALSE;
+			}
+			if (materialType == PBR_PHONG)
+			{
+				materialData.pbrPhong.diffuseColour = XMFLOAT3(colour.x, colour.y, colour.z);
+				materialData.pbrPhong.kSpecular = XMFLOAT3(0.04f, 0.04f, 0.04f);
+				materialData.pbrPhong.kShininess = 64.0f;
+				materialData.pbrPhong.hasDiffuseTex = FALSE;
+			}
+		}
 	}
-	else
-	{
-		app->getShaderDescriptors()->createNullTexture2DSRV();
-		if (materialType == BASIC)
-		{
-			materialData.basic.baseColor = colour;
-			materialData.basic.hasBaseColorTexture = FALSE;
-		}
-		if (materialType == PHONG)
-		{
-			materialData.phong.diffuseColour = colour;
-			materialData.phong.kDifusse = 0.85f;
-			materialData.phong.kSpecular = 0.35f;
-			materialData.phong.kShininess = 32.0f;
-			materialData.phong.hasDiffuseTex = FALSE;
-		}
-		if (materialType == PBR_PHONG)
-		{
-			materialData.pbrPhong.diffuseColour = XMFLOAT3(colour.x, colour.y, colour.z);
-			materialData.pbrPhong.kSpecular = XMFLOAT3(0.35f, 0.35f, 0.35f);
-			materialData.pbrPhong.kShininess = 32.0f;
-			materialData.pbrPhong.hasDiffuseTex = FALSE;
-		}
-	}
+	
 
 
 	materialBuffer = app->getResources()->CreateDefaultBuffer(&materialData, sizeof(MaterialData), "Material Buffer");
