@@ -15,6 +15,8 @@ RenderTextureCustom::~RenderTextureCustom()
 
 void RenderTextureCustom::cleanUp()
 {
+	app->getD3D12()->flush();
+
 	texture.Reset();
 	depthStencil.Reset();
 	rtvHeap.Reset();
@@ -110,8 +112,6 @@ void RenderTextureCustom::beginRender(ID3D12GraphicsCommandList* commandList)
 {
 	transitionToState(commandList, D3D12_RESOURCE_STATE_RENDER_TARGET);
 	setRenderTarget(commandList);
-	
-	commandList->ClearRenderTargetView(rtvHandle, (float*)&clearColor, 0, nullptr);
 
 	if (depthFormat != DXGI_FORMAT_UNKNOWN)
 	{
@@ -119,7 +119,6 @@ void RenderTextureCustom::beginRender(ID3D12GraphicsCommandList* commandList)
 		UINT8 clearStencil = 0;
 		commandList->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, clearDepth, clearStencil, 0, nullptr);
 	}
-	//commandList->ClearRenderTargetView(rtvHandle, (float*)&clearColor, 0, nullptr);
 }
 
 void RenderTextureCustom::endRender(ID3D12GraphicsCommandList* commandList)
