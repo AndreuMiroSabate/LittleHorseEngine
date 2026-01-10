@@ -6,12 +6,11 @@
 #include "ModuleRingBuffer.h"
 #include "Application.h"
 #include "ReadData.h"
+#include"RenderTextureCustom.h"
 
 #include <d3d12.h>
 #include <d3dcompiler.h>
 #include "d3dx12.h"
-
-
 
 bool ModuleExercise7::init()
 {
@@ -29,6 +28,7 @@ bool ModuleExercise7::init()
 
 	debugDrawPass = std::make_unique<DebugDrawPass>(d3d12->getDevice(), d3d12->getCommandQueue());
 	imGuiPass = std::make_unique<ImGuiPass>(d3d12->getDevice(), d3d12->getHwnd());
+	renderTexture = std::make_unique<RenderTextureCustom>("Render Texture", 800, 600, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_D32_FLOAT, Vector4::Zero);
 	return true;
 }
 
@@ -37,43 +37,48 @@ void ModuleExercise7::preRender()
 	imGuiPass->startFrame();
 	ImGuizmo::BeginFrame();
 
-	unsigned width = app->getD3D12()->getWidth();
-	unsigned height = app->getD3D12()->getHeight();
+	ImGuiID dockspace_id = ImGui::GetID("MyDockNodeId");
+	ImGui::DockSpaceOverViewport(dockspace_id);
 
-	ImGuizmo::SetRect(0, 0, float(width), float(height));
+	static bool init = true;
+	ImVec2 mainSize = ImGui::GetMainViewport()->Size;
+	if (init)
+	{
+		init = false;
+		ImGui::DockBuilderRemoveNode(dockspace_id);
+		ImGui::DockBuilderAddNode(dockspace_id, ImGuiDockNodeFlags_CentralNode);
+		ImGui::DockBuilderSetNodeSize(dockspace_id, mainSize);
+
+		ImGuiID dock_id_left = 0, dock_id_right = 0;
+		ImGui::DockBuilderSplitNode(dockspace_id, ImGuiDir_Left, 0.75f, &dock_id_left, &dock_id_right);
+		ImGui::DockBuilderDockWindow("Geometry Viewer Options", dock_id_right);
+		ImGui::DockBuilderDockWindow("Scene", dock_id_left);
+
+		ImGui::DockBuilderFinish(dockspace_id);
+	}
+
+	if (canvasSize.x > 0.0f && canvasSize.y > 0.0f)
+	{
+		renderTexture->resize(int(canvasSize.x), int(canvasSize.y));
+	}
+
+	ImGuizmo::SetRect(0, 0, (float)canvasSize.x, (float)canvasSize.y);
 }
 
 void ModuleExercise7::render()
 {
+	commandsImGui();
 
 	ModuleD3D12* d3d12 = app->getD3D12();
 	ID3D12GraphicsCommandList* commandList = d3d12->getCommandList();
-
 	ID3D12DescriptorHeap* srvHeap;
 	ModuleSamplers* samples = app->getSamplers();
 	ModuleShaderDescriptors* shaderDescriptors = app->getShaderDescriptors();
 	ModuleRingBuffer* ringBuffer = app->getRingBuffer();
 
-	commandsImGui();
-
-	unsigned width, height;
-	d3d12->getWindowSize(width, height);
-
 	commandList->Reset(d3d12->getCommandAllocator(), pipelineState.Get());
 
-	Matrix modelMatrix = model->getModelMatrix();
-
-	Matrix view = app->getCamara()->GetViewMatrix();
-
-	app->getCamara()->SetLookAt(Vector3::Zero);
-
-	float aspectRatio = float(width) / float(height);
-	float fovY = XM_PIDIV4;
-
-	Matrix projection = Matrix::CreatePerspectiveFieldOfView(fovY, aspectRatio, 0.1f, 100.0f);
-
-	Matrix mvp = (modelMatrix * view * projection).Transpose();
-
+	renderToTexture(commandList);
 
 	float clearColor[] = { 0.2f, 0.2f, 0.2f, 1.0f };
 
@@ -84,65 +89,6 @@ void ModuleExercise7::render()
 	);
 	commandList->ResourceBarrier(1, &barrier);
 
-
-
-	D3D12_VIEWPORT viewport{ 0.0f, 0.0f, float(width), float(height), 0.0f, 1.0f };
-	D3D12_RECT scissorRect{ 0, 0, (LONG)width, (LONG)height };
-	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = d3d12->getRenderTargetDescriptor();
-	D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = d3d12->getDepthStencilDescriptor();
-
-	PerFrame perframe;
-	perframe.L = light.L;
-	perframe.Lc = light.Lc;
-	perframe.Ac = light.Ac;
-	perframe.viewPos = app->getCamara()->GetPos();
-
-	perframe.L.Normalize();
-
-
-	commandList->RSSetScissorRects(1, &scissorRect);
-	commandList->OMSetRenderTargets(1, &rtvHandle, false, &dsvHandle);
-	commandList->ClearRenderTargetView(rtvHandle, clearColor, 0, nullptr);
-	commandList->ClearDepthStencilView(dsvHandle, D3D12_CLEAR_FLAG_DEPTH, 1.0f, 0, 0, nullptr);
-	commandList->RSSetViewports(1, &viewport);
-	commandList->SetGraphicsRootSignature(rootSignature.Get());
-	commandList->IASetPrimitiveTopology(D3D_PRIMITIVE_TOPOLOGY_TRIANGLELIST);
-	commandList->IASetVertexBuffers(0, 1, &vertexBufferView);
-
-	ID3D12DescriptorHeap* descriptorHeaps[] = { shaderDescriptors->getDescriptorHeap(), samples->getHeap() };
-	commandList->SetDescriptorHeaps(2, descriptorHeaps);
-
-	commandList->SetGraphicsRoot32BitConstants(0, sizeof(XMMATRIX) / sizeof(UINT32), &mvp, 0);
-	commandList->SetGraphicsRootConstantBufferView(1, ringBuffer->allocBufferAcess(&perframe));
-	commandList->SetGraphicsRootDescriptorTable(4, samples->GetGPUHandle(samplerIndex));
-
-	BEGIN_EVENT(commandList, "Model Render Pass");
-	for (const Mesh& mesh : model->GetMeshes())
-	{
-		if (mesh.getMaterialIndex() < model->GetMaterials().size())
-		{
-			const BasicMaterial& material = model->GetMaterials()[mesh.getMaterialIndex()];
-
-			PerInstance perInstance = { model->getModelMatrix().Transpose(), model->getNormalMatrix().Transpose(), material.getPBRPhong() };
-
-			commandList->SetGraphicsRootConstantBufferView(2, ringBuffer->allocBufferAcess(&perInstance));
-			commandList->SetGraphicsRootDescriptorTable(3, material.getShaderDescriptors()->getGPUHandle(material.getShaderDescriptorsIndex()));
-
-			mesh.drawIndexes(commandList);
-		}
-	}
-	END_EVENT(commandList);
-
-	if (showGrid)
-	{
-		dd::xzSquareGrid(-10.0f, 10.0f, 0.0f, 1.0f, dd::colors::Gray);
-	}
-	if (showAxis)
-	{
-		dd::axisTriad(ddConvert(Matrix::Identity), 0.1f, 1.0f);
-	}
-
-	debugDrawPass->record(commandList, width, height, view, projection);
 	imGuiPass->record(commandList, d3d12->getRenderTargetDescriptor());
 
 	barrier = CD3DX12_RESOURCE_BARRIER::Transition(
@@ -362,24 +308,43 @@ void ModuleExercise7::commandsImGui()
 		ImGui::End();
 	}
 
+	bool viewerFocused = false;
+	ImGui::Begin("Scene");
+	const char* frameName = "Scene Frame";
+	ImGuiID id(10);
+
+	ImVec2 max = ImGui::GetWindowContentRegionMax();
+	ImVec2 min = ImGui::GetWindowContentRegionMin();
+	canvasPos = min;
+	canvasSize = ImVec2(max.x - min.x, max.y - min.y);
+	ImVec2 cursorPos = ImGui::GetCursorScreenPos();
+
+	ImGui::BeginChildFrame(id, canvasSize, ImGuiWindowFlags_NoScrollbar);
+	viewerFocused = ImGui::IsWindowFocused();
+
+	ImGui::Image((ImTextureID)renderTexture->getSRV().ptr, canvasSize);
+
 	if (showGuizmo)
 	{
-		unsigned width = app->getD3D12()->getWidth();
-		unsigned height = app->getD3D12()->getHeight();
+		const Matrix& viewMatrix = app->getCamara()->GetViewMatrix();
+		Matrix projMatrix = app->getCamara()->GetProjectionMatrix(float(canvasSize.x) / float(canvasSize.y));
 
-		const Matrix& view = app->getCamara()->GetViewMatrix();
-		Matrix projection = app->getCamara()->GetProjectionMatrix(float(width) / float(height));
+		// Manipulate the object
+		ImGuizmo::SetRect(cursorPos.x, cursorPos.y, canvasSize.x, canvasSize.y);
+		ImGuizmo::SetDrawlist();
+		ImGuizmo::Manipulate((const float*)&viewMatrix, (const float*)&projMatrix, gizmoOperation, ImGuizmo::LOCAL, (float*)&modelM);
+	}
 
-		ImGuizmo::Manipulate((float*)&view, (float*)&projection, gizmoOperationLocal, ImGuizmo::LOCAL, (float*)&modelM);
+	ImGui::EndChildFrame();
+	ImGui::End();
 
-		ImGuiIO& io = ImGui::GetIO();
+	ImGuiIO& io = ImGui::GetIO();
 
-		app->getCamara()->SetBlockMouse(io.WantCaptureMouse || (showGuizmo && ImGuizmo::IsUsing()));
+	app->getCamara()->SetBlockMouse(!viewerFocused);
 
-		if (ImGuizmo::IsUsing())
-		{
-			model->setModelMatrix(modelM);
-		}
+	if (ImGuizmo::IsUsing())
+	{
+		model->setModelMatrix(modelM);
 	}
 
 
@@ -413,6 +378,81 @@ void ModuleExercise7::commandsImGui()
 	{
 		ImGui::ShowDemoWindow(&showDemoWindow);
 	}
+
+
+}
+
+void ModuleExercise7::renderToTexture(ID3D12GraphicsCommandList* commandList)
+{
+
+	ModuleD3D12* d3d12 = app->getD3D12();
+	ID3D12DescriptorHeap* srvHeap;
+	ModuleSamplers* samples = app->getSamplers();
+	ModuleShaderDescriptors* shaderDescriptors = app->getShaderDescriptors();
+	ModuleRingBuffer* ringBuffer = app->getRingBuffer();
+
+	unsigned width, height;
+	d3d12->getWindowSize(width, height);
+	float aspectRatio = float(width) / float(height);
+	float fovY = XM_PIDIV4;
+
+	Matrix modelMatrix = model->getModelMatrix();
+
+	Matrix view = app->getCamara()->GetViewMatrix();
+
+	app->getCamara()->SetLookAt(Vector3::Zero);
+
+	Matrix projection = Matrix::CreatePerspectiveFieldOfView(fovY, aspectRatio, 0.1f, 100.0f);
+	Matrix mvp = (modelMatrix * view * projection).Transpose();
+
+	D3D12_VIEWPORT viewport{ 0.0f, 0.0f, float(width), float(height), 0.0f, 1.0f };
+	D3D12_RECT scissorRect{ 0, 0, (LONG)width, (LONG)height };
+	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = d3d12->getRenderTargetDescriptor();
+	D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = d3d12->getDepthStencilDescriptor();
+
+	PerFrame perframe;
+	perframe.L = light.L;
+	perframe.Lc = light.Lc;
+	perframe.Ac = light.Ac;
+	perframe.viewPos = app->getCamara()->GetPos();
+
+	perframe.L.Normalize();
+
+	renderTexture->beginRender(commandList);
+
+	commandList->SetGraphicsRoot32BitConstants(0, sizeof(XMMATRIX) / sizeof(UINT32), &mvp, 0);
+	commandList->SetGraphicsRootConstantBufferView(1, ringBuffer->allocBufferAcess(&perframe));
+	commandList->SetGraphicsRootDescriptorTable(4, samples->GetGPUHandle(samplerIndex));
+
+	BEGIN_EVENT(commandList, "Model Render Pass");
+	for (const Mesh& mesh : model->GetMeshes())
+	{
+		if (mesh.getMaterialIndex() < model->GetMaterials().size())
+		{
+			const BasicMaterial& material = model->GetMaterials()[mesh.getMaterialIndex()];
+
+			PerInstance perInstance = { model->getModelMatrix().Transpose(), model->getNormalMatrix().Transpose(), material.getPBRPhong() };
+
+			commandList->SetGraphicsRootConstantBufferView(2, ringBuffer->allocBufferAcess(&perInstance));
+			commandList->SetGraphicsRootDescriptorTable(3, material.getShaderDescriptors()->getGPUHandle(material.getShaderDescriptorsIndex()));
+
+			mesh.drawIndexes(commandList);
+		}
+	}
+	END_EVENT(commandList);
+
+	if (showGrid)
+	{
+		dd::xzSquareGrid(-10.0f, 10.0f, 0.0f, 1.0f, dd::colors::Gray);
+	}
+	if (showAxis)
+	{
+		dd::axisTriad(ddConvert(Matrix::Identity), 0.1f, 1.0f);
+	}
+
+	debugDrawPass->record(commandList, width, height, view, projection);
+	renderTexture->endRender(commandList);
+
 }
 
 

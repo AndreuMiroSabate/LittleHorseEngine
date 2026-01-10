@@ -7,6 +7,7 @@
 #include "Mesh.h"
 #include "ImGuizmo.h"
 #include "BasicMaterial.h"
+#include "RenderTextureCustom.h"
 
 
 class ModuleExercise7 :
@@ -51,6 +52,8 @@ public:
     Matrix createModelMatrix();
 
     void commandsImGui();
+    
+	void renderToTexture(ID3D12GraphicsCommandList* commandList);
 
 private:
 
@@ -61,6 +64,7 @@ private:
     std::unique_ptr<Model> model;
     std::unique_ptr<DebugDrawPass> debugDrawPass;
     std::unique_ptr<ImGuiPass> imGuiPass;
+	std::unique_ptr<RenderTextureCustom> renderTexture;
 
     Light light;
 
@@ -76,6 +80,9 @@ private:
     bool consoleOpen = true;
 
     int samplerIndex = 0;
+
+	ImVec2 canvasSize = ImVec2(1280, 720);
+    ImVec2 canvasPos;
 };
 
 
