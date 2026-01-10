@@ -29,6 +29,10 @@ bool ModuleExercise7::init()
 	debugDrawPass = std::make_unique<DebugDrawPass>(d3d12->getDevice(), d3d12->getCommandQueue());
 	imGuiPass = std::make_unique<ImGuiPass>(d3d12->getDevice(), d3d12->getHwnd());
 	renderTexture = std::make_unique<RenderTextureCustom>("Render Texture", 800, 600, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_D32_FLOAT, Vector4::Zero);
+
+	if(!renderTexture->init(app))
+		return false;
+
 	return true;
 }
 
@@ -82,6 +86,9 @@ void ModuleExercise7::render()
 
 	float clearColor[] = { 0.2f, 0.2f, 0.2f, 1.0f };
 
+	unsigned width, height;
+	d3d12->getWindowSize(width, height);
+
 	CD3DX12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Transition(
 		d3d12->getBackBuffers(),
 		D3D12_RESOURCE_STATE_PRESENT,
@@ -89,7 +96,15 @@ void ModuleExercise7::render()
 	);
 	commandList->ResourceBarrier(1, &barrier);
 
-	imGuiPass->record(commandList, d3d12->getRenderTargetDescriptor());
+	D3D12_VIEWPORT viewport{ 0.0f, 0.0f, float(width), float(height), 0.0f, 1.0f };
+	D3D12_RECT scissorRect{ 0, 0, LONG(width), LONG(height) };
+	commandList->RSSetViewports(1, &viewport);
+	commandList->RSSetScissorRects(1, &scissorRect);
+
+	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = d3d12->getRenderTargetDescriptor();
+	commandList->ClearRenderTargetView(rtvHandle, clearColor, 0, nullptr);
+
+	imGuiPass->record(commandList, rtvHandle);
 
 	barrier = CD3DX12_RESOURCE_BARRIER::Transition(
 		d3d12->getBackBuffers(),
@@ -391,8 +406,9 @@ void ModuleExercise7::renderToTexture(ID3D12GraphicsCommandList* commandList)
 	ModuleShaderDescriptors* shaderDescriptors = app->getShaderDescriptors();
 	ModuleRingBuffer* ringBuffer = app->getRingBuffer();
 
-	unsigned width, height;
-	d3d12->getWindowSize(width, height);
+	unsigned width = renderTexture->getWidth();
+	unsigned height = renderTexture->getHeight();
+
 	float aspectRatio = float(width) / float(height);
 	float fovY = XM_PIDIV4;
 
@@ -400,15 +416,13 @@ void ModuleExercise7::renderToTexture(ID3D12GraphicsCommandList* commandList)
 
 	Matrix view = app->getCamara()->GetViewMatrix();
 
-	app->getCamara()->SetLookAt(Vector3::Zero);
-
 	Matrix projection = Matrix::CreatePerspectiveFieldOfView(fovY, aspectRatio, 0.1f, 100.0f);
 	Matrix mvp = (modelMatrix * view * projection).Transpose();
 
-	D3D12_VIEWPORT viewport{ 0.0f, 0.0f, float(width), float(height), 0.0f, 1.0f };
+	/*D3D12_VIEWPORT viewport{ 0.0f, 0.0f, float(width), float(height), 0.0f, 1.0f };
 	D3D12_RECT scissorRect{ 0, 0, (LONG)width, (LONG)height };
 	D3D12_CPU_DESCRIPTOR_HANDLE rtvHandle = d3d12->getRenderTargetDescriptor();
-	D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = d3d12->getDepthStencilDescriptor();
+	D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = d3d12->getDepthStencilDescriptor();*/
 
 	PerFrame perframe;
 	perframe.L = light.L;
@@ -419,6 +433,12 @@ void ModuleExercise7::renderToTexture(ID3D12GraphicsCommandList* commandList)
 	perframe.L.Normalize();
 
 	renderTexture->beginRender(commandList);
+
+	commandList->SetGraphicsRootSignature(rootSignature.Get());
+
+	ID3D12DescriptorHeap* descriptorHeaps[] = { shaderDescriptors->getDescriptorHeap(), samples->getHeap() };
+
+	commandList->SetDescriptorHeaps(2, descriptorHeaps);
 
 	commandList->SetGraphicsRoot32BitConstants(0, sizeof(XMMATRIX) / sizeof(UINT32), &mvp, 0);
 	commandList->SetGraphicsRootConstantBufferView(1, ringBuffer->allocBufferAcess(&perframe));

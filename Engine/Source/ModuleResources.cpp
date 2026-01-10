@@ -165,10 +165,20 @@ ComPtr<ID3D12Resource> ModuleResources::createRenderTarget(size_t width, size_t 
 {
 	ComPtr<ID3D12Resource> renderTarget;
 
+	D3D12_RESOURCE_DESC descTex = CD3DX12_RESOURCE_DESC::Tex2D(format, UINT64(width), UINT(height), 1, 1, 1, 0,D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET);
 
-	D3D12_RESOURCE_DESC descTex = CD3DX12_RESOURCE_DESC::Tex2D(format, UINT64(width), UINT(height), 1,1);
 	CD3DX12_HEAP_PROPERTIES heap(D3D12_HEAP_TYPE_DEFAULT);
-	device->CreateCommittedResource(&heap, D3D12_HEAP_FLAG_NONE, &descTex, D3D12_RESOURCE_STATE_RENDER_TARGET, nullptr, IID_PPV_ARGS(&renderTarget));
+
+	D3D12_CLEAR_VALUE clearValue = {};
+	clearValue.Format = format;
+	clearValue.Color[0] = clearColor.x;
+	clearValue.Color[1] = clearColor.y;
+	clearValue.Color[2] = clearColor.z;
+	clearValue.Color[3] = clearColor.w;
+
+	device->CreateCommittedResource(&heap, D3D12_HEAP_FLAG_NONE, &descTex, D3D12_RESOURCE_STATE_RENDER_TARGET, &clearValue, IID_PPV_ARGS(&renderTarget));
+
 	renderTarget->SetName(std::wstring(name, name + strlen(name)).c_str());
+
 	return renderTarget;
 }
