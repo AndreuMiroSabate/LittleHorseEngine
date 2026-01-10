@@ -347,7 +347,7 @@ void ModuleExercise7::commandsImGui()
 		// Manipulate the object
 		ImGuizmo::SetRect(cursorPos.x, cursorPos.y, canvasSize.x, canvasSize.y);
 		ImGuizmo::SetDrawlist();
-		ImGuizmo::Manipulate((const float*)&viewMatrix, (const float*)&projMatrix, gizmoOperation, ImGuizmo::LOCAL, (float*)&modelM);
+		ImGuizmo::Manipulate((const float*)&viewMatrix, (const float*)&projMatrix, gizmoOperationLocal, ImGuizmo::LOCAL, (float*)&modelM);
 	}
 
 	ImGui::EndChildFrame();
