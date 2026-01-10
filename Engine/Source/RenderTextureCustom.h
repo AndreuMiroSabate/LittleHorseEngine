@@ -1,14 +1,20 @@
 #pragma once
+#include "Application.h"
+
 class RenderTextureCustom
 {
 
 public:
 
-	RenderTextureCustom(const char* name, UINT width, UINT height, DXGI_FORMAT format, DXGI_FORMAT depthFormat = DXGI_FORMAT_UNKNOWN, const Vector4& clearColor = Vector4::Zero)
-		: name(name), format(format), depthFormat(depthFormat), clearColor(clearColor) 
+	RenderTextureCustom(const char* name, UINT width, UINT height, DXGI_FORMAT format, DXGI_FORMAT depthFormat, const Vector4& clearColor)
+		: name(name), width(width), height(height), format(format), depthFormat(depthFormat), clearColor(clearColor) 
 	{};
 
 	~RenderTextureCustom();
+
+	bool init(Application* app);
+
+	void cleanUp();
 
 	UINT getWidth() const { return width; }
 	UINT getHeight() const { return height; }
@@ -34,10 +40,15 @@ private:
 	D3D12_CPU_DESCRIPTOR_HANDLE srvHandle = {};
 	D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = {};
 
+	ComPtr<ID3D12DescriptorHeap> rtvHeap;
+	ComPtr<ID3D12DescriptorHeap> dsvHeap;
+
 	DXGI_FORMAT format;
 	DXGI_FORMAT depthFormat;
 
 	Vector4 clearColor;
+
+	Application* app = nullptr;
 
 	const char* name;
 
