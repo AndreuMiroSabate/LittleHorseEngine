@@ -22,6 +22,8 @@ public:
 	D3D12_CPU_DESCRIPTOR_HANDLE getSRV() const { return srvHandle; }
 	D3D12_CPU_DESCRIPTOR_HANDLE getDSV() const { return dsvHandle; }
 
+	D3D12_GPU_DESCRIPTOR_HANDLE getSRVGPUHandle() const { return srvGPUHandle; }
+
 	void beginRender(ID3D12GraphicsCommandList* commandList);
 	void endRender(ID3D12GraphicsCommandList* commandList);
 
@@ -40,11 +42,15 @@ private:
 	D3D12_CPU_DESCRIPTOR_HANDLE srvHandle = {};
 	D3D12_CPU_DESCRIPTOR_HANDLE dsvHandle = {};
 
+	D3D12_GPU_DESCRIPTOR_HANDLE srvGPUHandle = {};
+
 	ComPtr<ID3D12DescriptorHeap> rtvHeap;
 	ComPtr<ID3D12DescriptorHeap> dsvHeap;
 
 	DXGI_FORMAT format;
 	DXGI_FORMAT depthFormat;
+
+	D3D12_RESOURCE_STATES currentState;
 
 	Vector4 clearColor;
 
@@ -53,7 +59,7 @@ private:
 	const char* name;
 
 private:
-	void transitionToState(ID3D12GraphicsCommandList* commandList, D3D12_RESOURCE_STATES newState, D3D12_RESOURCE_STATES oldState);
+	void transitionToState(ID3D12GraphicsCommandList* commandList, D3D12_RESOURCE_STATES newState);
 
 	void setRenderTarget(ID3D12GraphicsCommandList* commandList);
 

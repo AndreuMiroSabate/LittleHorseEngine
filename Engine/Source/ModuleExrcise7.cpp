@@ -337,7 +337,7 @@ void ModuleExercise7::commandsImGui()
 	ImGui::BeginChildFrame(id, canvasSize, ImGuiWindowFlags_NoScrollbar);
 	viewerFocused = ImGui::IsWindowFocused();
 
-	ImGui::Image((ImTextureID)renderTexture->getSRV().ptr, canvasSize);
+	ImGui::Image((ImTextureID)renderTexture->getSRVGPUHandle().ptr, canvasSize);
 
 	if (showGuizmo)
 	{

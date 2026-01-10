@@ -37,6 +37,8 @@ bool RenderTextureCustom::init(Application* app)
     texture = resources->createRenderTarget(width, height, format, clearColor, name);
     if (!texture) return false;
 
+	currentState = D3D12_RESOURCE_STATE_COMMON;
+
     D3D12_DESCRIPTOR_HEAP_DESC rtvHeapDesc = {};
     rtvHeapDesc.NumDescriptors = 1;
     rtvHeapDesc.Type = D3D12_DESCRIPTOR_HEAP_TYPE_RTV;
@@ -67,6 +69,8 @@ bool RenderTextureCustom::init(Application* app)
     srvDesc.Texture2D.ResourceMinLODClamp = 0.0f;
 
     d3d12->getDevice()->CreateShaderResourceView(texture.Get(), &srvDesc, srvHandle);
+
+	srvGPUHandle = shaderDescriptors->getGPUHandle(srvIndex);
 
     if (depthFormat != DXGI_FORMAT_UNKNOWN)
     {
@@ -99,14 +103,12 @@ bool RenderTextureCustom::init(Application* app)
         d3d12->getDevice()->CreateDepthStencilView(depthStencil.Get(), &dsvDesc, dsvHandle);
     }
 
-	shaderDescriptors->createSRV(texture.Get(), 0);
-
     return true;
 }
 
 void RenderTextureCustom::beginRender(ID3D12GraphicsCommandList* commandList)
 {
-	transitionToState(commandList, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
+	transitionToState(commandList, D3D12_RESOURCE_STATE_RENDER_TARGET);
 	setRenderTarget(commandList);
 	
 	commandList->ClearRenderTargetView(rtvHandle, (float*)&clearColor, 0, nullptr);
@@ -122,17 +124,22 @@ void RenderTextureCustom::beginRender(ID3D12GraphicsCommandList* commandList)
 
 void RenderTextureCustom::endRender(ID3D12GraphicsCommandList* commandList)
 {
-	transitionToState(commandList, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE, D3D12_RESOURCE_STATE_RENDER_TARGET);
+	transitionToState(commandList, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
 }
 
-void RenderTextureCustom::transitionToState(ID3D12GraphicsCommandList* commandList, D3D12_RESOURCE_STATES newState, D3D12_RESOURCE_STATES oldState)
+void RenderTextureCustom::transitionToState(ID3D12GraphicsCommandList* commandList, D3D12_RESOURCE_STATES newState)
 {
+	if(currentState == newState)
+		return;
+
 	CD3DX12_RESOURCE_BARRIER barrier = CD3DX12_RESOURCE_BARRIER::Transition(
 		texture.Get(),
-		oldState,
+		currentState,
 		newState
 	);
 	commandList->ResourceBarrier(1, &barrier);
+
+	currentState = newState;
 }
 
 void RenderTextureCustom::setRenderTarget(ID3D12GraphicsCommandList* commandList)

@@ -176,7 +176,7 @@ ComPtr<ID3D12Resource> ModuleResources::createRenderTarget(size_t width, size_t 
 	clearValue.Color[2] = clearColor.z;
 	clearValue.Color[3] = clearColor.w;
 
-	device->CreateCommittedResource(&heap, D3D12_HEAP_FLAG_NONE, &descTex, D3D12_RESOURCE_STATE_RENDER_TARGET, &clearValue, IID_PPV_ARGS(&renderTarget));
+	device->CreateCommittedResource(&heap, D3D12_HEAP_FLAG_NONE, &descTex, D3D12_RESOURCE_STATE_COMMON, &clearValue, IID_PPV_ARGS(&renderTarget));
 
 	renderTarget->SetName(std::wstring(name, name + strlen(name)).c_str());
 
