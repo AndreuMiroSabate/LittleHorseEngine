@@ -160,3 +160,15 @@ ComPtr<ID3D12Resource> ModuleResources::createTextureFromFile(const wchar_t* fil
 	return texture;
 
 }
+
+ComPtr<ID3D12Resource> ModuleResources::createRenderTarget(size_t width, size_t height, DXGI_FORMAT format, Vector4 clearColor, const char* name)
+{
+	ComPtr<ID3D12Resource> renderTarget;
+
+
+	D3D12_RESOURCE_DESC descTex = CD3DX12_RESOURCE_DESC::Tex2D(format, UINT64(width), UINT(height), 1,1);
+	CD3DX12_HEAP_PROPERTIES heap(D3D12_HEAP_TYPE_DEFAULT);
+	device->CreateCommittedResource(&heap, D3D12_HEAP_FLAG_NONE, &descTex, D3D12_RESOURCE_STATE_RENDER_TARGET, nullptr, IID_PPV_ARGS(&renderTarget));
+	renderTarget->SetName(std::wstring(name, name + strlen(name)).c_str());
+	return renderTarget;
+}

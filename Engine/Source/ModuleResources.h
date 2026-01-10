@@ -17,6 +17,7 @@ public:
     ComPtr<ID3D12Resource> CreateDefaultBuffer(const void* data, size_t size, const char* name);
     ComPtr<ID3D12Resource> getUploadHeap(size_t size);
     ComPtr<ID3D12Resource> createTextureFromFile(const wchar_t* filename, bool defaultSRGB);
+	ComPtr<ID3D12Resource> createRenderTarget(size_t width, size_t height, DXGI_FORMAT format, Vector4 clearColor, const char* name);
 
 private:
 
