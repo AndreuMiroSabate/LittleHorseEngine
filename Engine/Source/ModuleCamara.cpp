@@ -51,10 +51,6 @@ void ModuleCamara::update()
 	Vector3 translation = Vector3::Zero;
 	Vector2 rotation = Vector2::Zero;
 
-	ImGuiIO& io = ImGui::GetIO();
-
-	blockMouse = io.WantCaptureMouse;
-
 	float speed = moveSpeed;
 
 	float dt = ImGui::GetIO().DeltaTime;

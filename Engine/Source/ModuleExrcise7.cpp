@@ -355,7 +355,7 @@ void ModuleExercise7::commandsImGui()
 
 	ImGuiIO& io = ImGui::GetIO();
 
-	app->getCamara()->SetBlockMouse(!viewerFocused);
+	//app->getCamara()->SetBlockMouse(!viewerFocused);
 
 	if (ImGuizmo::IsUsing())
 	{
