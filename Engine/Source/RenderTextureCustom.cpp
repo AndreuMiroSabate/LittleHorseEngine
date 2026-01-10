@@ -8,6 +8,11 @@
 
 #include <d3d12.h>
 
+RenderTextureCustom::~RenderTextureCustom()
+{
+
+}
+
 void RenderTextureCustom::beginRender(ID3D12GraphicsCommandList* commandList)
 {
 	transitionToState(commandList, D3D12_RESOURCE_STATE_RENDER_TARGET, D3D12_RESOURCE_STATE_PIXEL_SHADER_RESOURCE);
@@ -70,5 +75,39 @@ void RenderTextureCustom::resize(UINT newWidth, UINT newHeight)
 	this->height = newHeight;
 
 	ModuleResources* resources = app->getResources();
+	ModuleD3D12* d3d12 = app->getD3D12();
 	ModuleShaderDescriptors* shaderDescriptors = app->getShaderDescriptors();
+
+	D3D12_RESOURCE_DESC textureDesc = {};
+	textureDesc.MipLevels = 1;
+	textureDesc.Format = format;
+	textureDesc.Width = width;
+	textureDesc.Height = height;
+	textureDesc.Flags = D3D12_RESOURCE_FLAG_ALLOW_RENDER_TARGET;
+	textureDesc.DepthOrArraySize = 1;
+	textureDesc.SampleDesc.Count = 1;
+	textureDesc.SampleDesc.Quality = 0;
+	textureDesc.Dimension = D3D12_RESOURCE_DIMENSION_TEXTURE2D;
+	D3D12_CLEAR_VALUE clearValue = {};
+	clearValue.Format = format;
+	clearValue.Color[0] = clearColor.x;
+	clearValue.Color[1] = clearColor.y;
+	clearValue.Color[2] = clearColor.z;
+	clearValue.Color[3] = clearColor.w;
+	texture = resources->createRenderTarget(width, height, format, clearColor, name);
+	rtvHandle = shaderDescriptors->getCPUHandle(shaderDescriptors->allocteDescriptor());
+	srvHandle = shaderDescriptors->getCPUHandle(shaderDescriptors->allocteDescriptor());
+	D3D12_RENDER_TARGET_VIEW_DESC rtvDesc = {};
+	rtvDesc.ViewDimension = D3D12_RTV_DIMENSION_TEXTURE2D;
+	rtvDesc.Format = format;
+	rtvDesc.Texture2D.MipSlice = 0;
+	d3d12->getDevice()->CreateRenderTargetView(texture.Get(), &rtvDesc, rtvHandle);
+	D3D12_SHADER_RESOURCE_VIEW_DESC srvDesc = {};
+	srvDesc.ViewDimension = D3D12_SRV_DIMENSION_TEXTURE2D;
+	srvDesc.Format = format;
+	srvDesc.Shader4ComponentMapping = D3D12_DEFAULT_SHADER_4_COMPONENT_MAPPING;
+	srvDesc.Texture2D.MipLevels = 1;
+	d3d12->getDevice()->CreateShaderResourceView(texture.Get(), &srvDesc, srvHandle);
+
+	shaderDescriptors->createSRV(texture.Get(), 0);
 }
