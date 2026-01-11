@@ -27,8 +27,9 @@ bool ModuleExercise7::init()
 	ImGuizmo::SetImGuiContext(ImGui::GetCurrentContext());
 
 	debugDrawPass = std::make_unique<DebugDrawPass>(d3d12->getDevice(), d3d12->getCommandQueue());
-	imGuiPass = std::make_unique<ImGuiPass>(d3d12->getDevice(), d3d12->getHwnd());
-	renderTexture = std::make_unique<RenderTextureCustom>("Render Texture", 800, 600, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_D32_FLOAT, Vector4::Zero);
+
+	imGuiPass = std::make_unique<ImGuiPass>(d3d12->getDevice(), d3d12->getHwnd(), shaderDescriptors->getCPUHandle(0), shaderDescriptors->getGPUHandle(0));
+	renderTexture = std::make_unique<RenderTextureCustom>("Render Texture", 800, 600, DXGI_FORMAT_R8G8B8A8_UNORM, DXGI_FORMAT_D32_FLOAT, Vector4(0.2f, 0.2f, 0.2f, 1.0f));
 
 	if(!renderTexture->init(app))
 		return false;
@@ -246,15 +247,15 @@ void ModuleExercise7::commandsImGui()
 
 
 
-		if (ImGui::IsKeyPressed(ImGuiKey_E))
+		if (ImGui::IsKeyPressed(ImGuiKey_W))
 		{
 			gizmoOperationLocal = ImGuizmo::TRANSLATE;
 		}
-		if (ImGui::IsKeyPressed(ImGuiKey_R))
+		if (ImGui::IsKeyPressed(ImGuiKey_E))
 		{
 			gizmoOperationLocal = ImGuizmo::ROTATE;
 		}
-		if (ImGui::IsKeyPressed(ImGuiKey_T))
+		if (ImGui::IsKeyPressed(ImGuiKey_R))
 		{
 			gizmoOperationLocal = ImGuizmo::SCALE;
 		}
@@ -308,7 +309,7 @@ void ModuleExercise7::commandsImGui()
 						material.setPBRPhongMat(pbrPhong);
 					}
 
-					if (ImGui::ColorEdit3("Specular", reinterpret_cast<float*>(&pbrPhong.kSpecular), 0.01f))
+					if (ImGui::ColorEdit3("Specular", reinterpret_cast<float*>(&pbrPhong.kSpecular)))
 					{
 						material.setPBRPhongMat(pbrPhong);
 					}
