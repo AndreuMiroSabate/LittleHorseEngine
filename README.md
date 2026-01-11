@@ -11,3 +11,8 @@ Unity Camera Controls:
  - Left Click + Left Alt to orbit the object
  - F to center the view to the object
  - Left shift to increase the speed
+
+Transform controls
+- W to change guizmo to translate state
+- E to change guizmo to rotation state
+- T to change guizmo to scale state
