@@ -63,8 +63,6 @@ void BasicMaterial::load(const tinygltf::Model& model, const tinygltf::Material&
 				materialData.pbrPhong.hasDiffuseTex = TRUE;
 			}
 
-
-
 			shaderDescriptors = app->getShaderDescriptors();
 			shaderDescriptorIndex = shaderDescriptors->allocteDescriptor();
 			app->getShaderDescriptors()->createSRV(colorTexture.Get(), shaderDescriptorIndex);
@@ -73,7 +71,7 @@ void BasicMaterial::load(const tinygltf::Model& model, const tinygltf::Material&
 		}
 		else
 		{
-			app->getShaderDescriptors()->createNullTexture2DSRV();
+			
 			if (materialType == BASIC)
 			{
 				materialData.basic.baseColor = colour;
@@ -94,6 +92,7 @@ void BasicMaterial::load(const tinygltf::Model& model, const tinygltf::Material&
 				materialData.pbrPhong.kShininess = 64.0f;
 				materialData.pbrPhong.hasDiffuseTex = FALSE;
 			}
+			app->getShaderDescriptors()->createNullTexture2DSRV();
 		}
 	}
 	
