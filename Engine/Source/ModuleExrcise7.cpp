@@ -276,6 +276,7 @@ void ModuleExercise7::commandsImGui()
 			ImGuizmo::RecomposeMatrixFromComponents(translation, rotation, scale, (float*)&modelM);
 			model->setModelMatrix(modelM);
 		}
+		app->getCamara()->SetLookAt(Vector3(translation[0], translation[1], translation[2]));
 
 		ImGui::Separator();
 
