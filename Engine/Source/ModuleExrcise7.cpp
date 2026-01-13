@@ -346,7 +346,6 @@ void ModuleExercise7::commandsImGui()
 		const Matrix& viewMatrix = app->getCamara()->GetViewMatrix();
 		Matrix projMatrix = app->getCamara()->GetProjectionMatrix(float(canvasSize.x) / float(canvasSize.y));
 
-		// Manipulate the object
 		ImGuizmo::SetRect(cursorPos.x, cursorPos.y, canvasSize.x, canvasSize.y);
 		ImGuizmo::SetDrawlist();
 		ImGuizmo::Manipulate((const float*)&viewMatrix, (const float*)&projMatrix, gizmoOperationLocal, ImGuizmo::LOCAL, (float*)&modelM);
@@ -357,7 +356,7 @@ void ModuleExercise7::commandsImGui()
 
 	ImGuiIO& io = ImGui::GetIO();
 
-	//app->getCamara()->SetBlockMouse(!viewerFocused);
+	app->getCamara()->SetBlockMouse(!viewerFocused);
 
 	if (ImGuizmo::IsUsing())
 	{
